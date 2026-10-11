@@ -4,7 +4,9 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 const run = (c, o = {}) => { console.log('\n> ' + c); execSync(c, { stdio: 'inherit', ...o }); };
 run('npm run build');
-if (!existsSync('android')) run('npx cap add android');
+if (!existsSync('android/app/src/main/AndroidManifest.xml')) {
+  run('npx cap add android');
+}
 
 const mf = 'android/app/src/main/AndroidManifest.xml';
 let x = readFileSync(mf, 'utf8');
