@@ -39,7 +39,7 @@ jobs:
       - name: Sync Android
         run: npx cap sync android
 
-            - name: Pasang ikon DLMS L-Tronik
+      - name: Pasang ikon DLMS L-Tronik
         run: |
           python3 -m pip install Pillow
 
