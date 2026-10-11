@@ -39,28 +39,53 @@ jobs:
       - name: Sync Android
         run: npx cap sync android
 
-      - name: Copy icon DLMS L-Tronik
+            - name: Pasang ikon DLMS L-Tronik
         run: |
-          mkdir -p android/app/src/main/res/mipmap-mdpi
-          mkdir -p android/app/src/main/res/mipmap-hdpi
-          mkdir -p android/app/src/main/res/mipmap-xhdpi
-          mkdir -p android/app/src/main/res/mipmap-xxhdpi
-          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
-          if [ -f dlms-ltronik.png ]; then
-            echo "Logo ditemukan"
-          else
-            echo "ERROR: dlms-ltronik.png tidak ditemukan"
-            exit 1
-          fi
+          python3 -m pip install Pillow
 
-      - name: Build APK
-        run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          python3 - <<'PY'
+          from PIL import Image, ImageOps
+          from pathlib import Path
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: ltronik-dsp-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          src = Path("dlms-ltronik.png")
+
+          if not src.exists():
+              raise SystemExit("ERROR: File dlms-ltronik.png tidak ditemukan")
+
+          img = Image.open(src).convert("RGBA")
+
+          sizes = {
+              "mipmap-mdpi": 48,
+              "mipmap-hdpi": 72,
+              "mipmap-xhdpi": 96,
+              "mipmap-xxhdpi": 144,
+              "mipmap-xxxhdpi": 192,
+          }
+
+          res = Path("android/app/src/main/res")
+
+          for folder, size in sizes.items():
+              target = res / folder
+              target.mkdir(parents=True, exist_ok=True)
+
+              icon = ImageOps.fit(
+                  img,
+                  (size, size),
+                  method=Image.Resampling.LANCZOS
+              )
+
+              icon.save(target / "ic_launcher.png")
+              icon.save(target / "ic_launcher_round.png")
+
+          # Hapus ikon adaptif bawaan agar ikon PNG baru digunakan.
+          for folder in [
+              res / "mipmap-anydpi-v26",
+              res / "mipmap-anydpi",
+          ]:
+              for name in ["ic_launcher.xml", "ic_launcher_round.xml"]:
+                  path = folder / name
+                  if path.exists():
+                      path.unlink()
+
+          print("Ikon DLMS L-Tronik berhasil dipasang.")
+          PY
