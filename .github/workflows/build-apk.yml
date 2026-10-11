@@ -15,6 +15,9 @@ jobs:
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 21 }
       - run: npm install
+      - name: Siapkan ikon DLMS L-Tronik
+        run: | mkdir -p android/app/src/main/res/drawable
+          cp dlms-ltronik.png android/app/src/main/res/drawable/dlms_ltronik.png
       - run: npm run apk
       - run: cp android/app/build/outputs/apk/debug/app-debug.apk ltronik-dsp.apk
       - uses: actions/upload-artifact@v4
