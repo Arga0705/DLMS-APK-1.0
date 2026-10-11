@@ -17,7 +17,6 @@ jobs:
       - run: npm install
       - name: Siapkan ikon DLMS L-Tronik
         run: |
-          test -f dlms-ltronik.png
           mkdir -p android/app/src/main/res/drawable
           cp dlms-ltronik.png android/app/src/main/res/drawable/dlms_ltronik.png
       - run: npm run apk
