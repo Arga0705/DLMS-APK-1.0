@@ -1,29 +1,66 @@
 name: Build APK
+
 on:
   workflow_dispatch:
   push:
     tags: ['v*']
+
 permissions:
   contents: write
+
 jobs:
   apk:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 20 }
-      - uses: actions/setup-java@v4
-        with: { distribution: temurin, java-version: 21 }
-      - run: npm install
-      - name: Siapkan ikon DLMS L-Tronik
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build web
+        run: npm run build
+
+      - name: Setup Android
+        run: npx cap add android
+
+      - name: Sync Android
+        run: npx cap sync android
+
+      - name: Copy icon DLMS L-Tronik
         run: |
-          mkdir -p android/app/src/main/res/drawable
-          cp dlms-ltronik.png android/app/src/main/res/drawable/dlms_ltronik.png
-      - run: npm run apk
-      - run: cp android/app/build/outputs/apk/debug/app-debug.apk ltronik-dsp.apk
-      - uses: actions/upload-artifact@v4
-        with: { name: ltronik-dsp-apk, path: ltronik-dsp.apk }
-      - name: Rilis (hanya saat tag v*)
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with: { files: ltronik-dsp.apk }
+          mkdir -p android/app/src/main/res/mipmap-mdpi
+          mkdir -p android/app/src/main/res/mipmap-hdpi
+          mkdir -p android/app/src/main/res/mipmap-xhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
+          if [ -f dlms-ltronik.png ]; then
+            echo "Logo ditemukan"
+          else
+            echo "ERROR: dlms-ltronik.png tidak ditemukan"
+            exit 1
+          fi
+
+      - name: Build APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ltronik-dsp-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
