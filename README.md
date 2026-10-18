@@ -1,32 +1,25 @@
-# L-TRONIK DSP PRO - aplikasi Android
+# L-TRONIK Updater (Android)
 
-Bungkus Capacitor untuk UI BLE. Memakai plugin @capacitor-community/bluetooth-le (BLE native),
-protokolnya sama dengan firmware v1.9.4.
+Aplikasi untuk memperbarui firmware L-TRONIK DSP lewat Bluetooth LE. Tanpa pustaka tambahan.
+Protokolnya sama dengan `ltronik_dsp_update.html` dan firmware v1.9.6 ke atas.
 
-## Syarat
-- Node.js 20 atau lebih baru
-- Android Studio (sudah termasuk JDK dan Android SDK)
+## Membuat APK
+1. Buka Android Studio (versi Koala atau lebih baru), pilih File > Open, lalu pilih folder ini.
+2. Tunggu Gradle sync selesai. Kalau diminta, setujui saran upgrade Android Gradle Plugin.
+3. Build > Build Bundle(s) / APK(s) > Build APK(s).
+4. File APK ada di `app/build/outputs/apk/debug/app-debug.apk`. Salin ke HP dan pasang (izinkan pasang dari sumber ini).
 
-## Bangun APK
-    npm install
-    npm run apk
+Android Studio memakai Gradle dari `gradle/wrapper/gradle-wrapper.properties`, jadi `gradle-wrapper.jar` tidak diperlukan.
+Untuk build lewat terminal jalankan dulu `gradle wrapper` satu kali.
 
-Hasil: android/app/build/outputs/apk/debug/app-debug.apk (kirim ke HP, izinkan "install dari sumber tidak dikenal").
+## Cara pakai
+1. Di Arduino IDE: Sketch > Export Compiled Binary. Ambil file berakhiran `.ino.bin`.
+2. Buka aplikasi, izinkan Bluetooth, tekan Hubungkan (DSP akan dicari otomatis).
+3. Pilih file `.ino.bin`, cek sandi (bawaan `ltronik`, sama dengan `OTA_PASS` di firmware), tekan Mulai update.
+4. Biarkan layar menyala sampai DSP restart sendiri.
 
-Atau lewat Android Studio:
-    npm install
-    npm run setup
-    npx cap open android      (lalu Build > Build APK)
+Android 11 ke bawah: nyalakan Lokasi agar pemindaian Bluetooth jalan.
 
-## Catatan
-- Android 12 ke atas meminta izin "Perangkat di sekitar"; Android 11 ke bawah meminta izin lokasi (aturan Android untuk pemindaian BLE).
-- Mengubah UI: edit index.html lalu jalankan npm run setup lagi.
-- Ikon bawaan Capacitor; ganti lewat Android Studio (File > New > Image Asset).
-
-## Bangun APK otomatis di GitHub (tanpa Android Studio)
-1. Unggah isi folder ini ke repo GitHub.
-2. Tab Actions > Build APK > Run workflow. APK muncul di bagian Artifacts.
-3. Untuk tautan unduh tetap: buat tag, mis. `git tag v1.9.4 && git push --tags`. APK terlampir di Releases.
-4. Isi `APK_URL` di index.html dengan
-   https://github.com/NAMA/REPO/releases/latest/download/ltronik-dsp.apk
-   agar tombol "Unduh APK" di versi web mengarah ke sana.
+## Protokol (karakteristik 6e400004-b5a3-f393-e0a9-e50e24dcca9e)
+- HP ke DSP (write with response): `B` + ukuran (4 byte LE) + CRC32 (4 byte LE) + sandi, lalu `D` + data (maks 200 byte) berulang, lalu `E`. `X` untuk batal.
+- DSP ke HP (notify, 1 byte): 0x01 siap, 0x02 selesai, 0x81 sandi salah, 0x82 gagal mulai, 0x83 gagal tulis, 0x84 CRC salah, 0x85 gagal pasang, 0x86 waktu habis, 0x87 urutan salah.
