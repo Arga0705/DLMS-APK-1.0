@@ -1,7 +1,0 @@
-cd ltronik_android
-git init
-git add -A
-git commit -m "DSP app"
-git branch -M main
-git remote add origin https://github.com/NAMA/REPO.git
-git push -u origin main
