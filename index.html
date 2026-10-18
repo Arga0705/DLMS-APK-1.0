@@ -165,6 +165,15 @@ nav button[aria-selected=true]{color:var(--gold);border-color:#8c7420;background
 #toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--gold);color:#2b1d00;font-weight:800;padding:8px 16px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9}
 #toast.on{opacity:1}
 @media (max-width:380px){.fcol .f{font-size:9.5px}.t1 h1{font-size:21px}nav button{font-size:8.5px}}
+.fin,.tin{width:100%;font:inherit;color:var(--text);background:var(--deep);border:1px solid var(--line2);border-radius:10px;padding:9px 12px;min-height:42px}
+.fin::file-selector-button{font:inherit;font-weight:800;color:#d8d0ff;background:#1a1160;border:1px solid #6c4cff;border-radius:9px;padding:6px 11px;margin-right:10px;cursor:pointer}
+.ota-lbl{display:block;color:var(--dim);font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin:12px 0 6px}
+.ota-msg{font-size:13px;border-radius:10px;padding:9px 12px;background:var(--deep);border:1px solid var(--line2);margin-top:12px}
+.ota-msg.err{border-color:var(--bad);color:#ffb3c0}.ota-msg.good{border-color:var(--ok);color:#a6f3cf}
+.ota-pct{font:800 30px/1 var(--mono);letter-spacing:-.5px}
+.ota-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:8px 0}
+.ota-row span{font-family:var(--mono);font-size:12px;color:var(--dim)}
+.ota-row .ota-pct{color:var(--text);font-size:30px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -286,6 +295,7 @@ const refreshers=[]; const reg=f=>{refreshers.push(f);return f;};
 const refreshAll=()=>{document.documentElement.style.setProperty('--oc',OCOL[cur]);for(const f of refreshers)f();drawEq();};
 
 /* ====================== Transport: BLE nyata atau demo ====================== */
+const OTA={busy:false,cancel:false};
 const T={mode:'none',dev:null,rx:null,tx:null,connected:false,sent:0,queue:[],busy:false,dec:new TextDecoder(),buf:'',tries:0};
 function enqueue(key,line){const i=T.queue.findIndex(q=>q.key===key);
   if(i>=0)T.queue[i].line=line; else T.queue.push({key,line});
@@ -353,6 +363,7 @@ async function connectBle(){
 }
 async function onDisc(){
   if(T.mode==='demo')return;
+  if(OTA.busy)OTA.cancel=true;
   T.connected=false;T.queue.length=0;T.busy=false;
   if(T.tries<4){T.tries++;setStatus('Menyambung ulang…','wait');
     await new Promise(r=>setTimeout(r,1200+T.tries*600));
@@ -414,7 +425,7 @@ function parseEq(l){
 /* ====================== Polling ====================== */
 let tick=0,eqNext=0;
 setInterval(()=>{
-  if(!T.connected||document.hidden)return;
+  if(!T.connected||document.hidden||OTA.busy)return;
   tick++;
   if(T.queue.length<3){
     if(tab==='home')enqueue('pM','M');
@@ -709,6 +720,112 @@ function drawSpec(){
   if(!NATIVE)box.append(h('div',{class:'card'},chHead('Aplikasi Android'),
     h('p',{class:'note',style:'margin:0 0 12px',text:'Pasang versi aplikasi di HP Android. Setelah diunduh, buka file APK dan izinkan pemasangan dari sumber tidak dikenal.'}),
     h('a',{class:'hb apk',href:APK_URL,download:'ltronik-dsp.apk',style:'display:inline-flex'},'UNDUH APK')));
+})();
+
+/* ---------- UPDATE FIRMWARE (OTA lewat Bluetooth) ---------- */
+(()=>{const box=$('#sysBox');
+  const OTAC='6e400004-b5a3-f393-e0a9-e50e24dcca9e', OCHUNK=200;
+  const OERR={0x81:'Sandi update salah.',0x82:'DSP menolak update. Pastikan Partition Scheme di Arduino IDE punya slot OTA dan ukuran file wajar.',0x83:'Gagal menulis ke memori flash DSP.',0x84:'CRC file tidak cocok setelah dikirim. Coba ulangi.',0x85:'DSP menolak firmware ini. File mungkin bukan .ino.bin untuk ESP32-S3.',0x86:'Waktu habis atau koneksi putus.',0x87:'Urutan paket salah. Ulangi dari awal.'};
+  const CT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}return t;})();
+  const crc32=u=>{let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CT[(c^u[i])&0xFF]^(c>>>8);return(c^0xFFFFFFFF)>>>0;};
+  const fmtSz=n=>n>=1048576?(n/1048576).toFixed(2)+' MB':(n/1024).toFixed(0)+' KB';
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  let bin=null,crc=0,waiter=null;
+
+  const file=h('input',{type:'file',accept:'.bin',class:'fin',id:'otaFile'});
+  const pass=h('input',{type:'password',class:'tin',id:'otaPass',value:'ltronik',autocomplete:'off'});
+  const info=h('p',{class:'note',hidden:true,style:'font-family:var(--mono)'});
+  const msg=h('div',{class:'ota-msg',role:'status',hidden:true});
+  const go=h('button',{class:'ghost pri',type:'button',text:'Mulai update',disabled:true});
+  const stop=h('button',{class:'ghost',type:'button',text:'Batalkan'});
+  const pct=h('span',{class:'ota-pct',text:'0%'}), spd=h('span'), sent=h('span'), eta=h('span');
+  const bars=Array.from({length:16},()=>h('i'));
+  const meter=h('div',{class:'meter','aria-hidden':'true'},bars);
+  const prog=h('div',{hidden:true,style:'margin-top:14px'},
+    h('div',{class:'ota-row'},pct,spd),meter,h('div',{class:'ota-row'},sent,eta),h('div',{class:'btns'},stop));
+  const state=h('p',{class:'note'});
+
+  const say=(t,k)=>{if(!t){msg.hidden=true;return;}msg.hidden=false;msg.textContent=t;msg.className='ota-msg'+(k?' '+k:'');};
+  const draw=f=>{const lit=Math.round(f*16);bars.forEach((b,i)=>{b.className=i<lit?(i>=13?'on w':'on'):'';});pct.textContent=Math.floor(f*100)+'%';};
+  const ready=()=>T.connected&&T.mode==='ble';
+  function upd(){
+    go.disabled=!(ready()&&bin&&!OTA.busy);file.disabled=OTA.busy;pass.disabled=OTA.busy;
+    state.textContent=OTA.busy?'Update berjalan. Jangan tutup halaman dan biarkan layar tetap menyala.'
+      :T.mode==='demo'&&T.connected?'Mode demo tidak bisa dipakai untuk update. Hubungkan ke DSP asli.'
+      :T.mode==='native'?'Update firmware lewat Bluetooth hanya tersedia di Chrome (versi web). Buka aplikasi ini di Chrome Android.'
+      :!T.connected?'Hubungkan ke DSP lebih dulu (tombol CONNECT di atas).'
+      :'Terhubung. Pilih file .ino.bin lalu tekan Mulai update.';
+  }
+  reg(upd);
+
+  file.addEventListener('change',async e=>{
+    bin=null;info.hidden=true;say('');
+    const f=e.target.files[0]; if(!f){upd();return;}
+    if(/bootloader|partitions|merged/i.test(f.name)){say('File ini bukan firmware utama. Pakai file berakhiran .ino.bin.','err');upd();return;}
+    const u=new Uint8Array(await f.arrayBuffer());
+    if(u.length<65536){say('File terlalu kecil untuk firmware DSP.','err');upd();return;}
+    if(u[0]!==0xE9){say('Isi file bukan gambar firmware ESP32 (byte awal harus E9).','err');upd();return;}
+    bin=u;crc=crc32(u);info.hidden=false;
+    info.textContent=f.name+'  '+fmtSz(u.length)+'  CRC '+crc.toString(16).padStart(8,'0');upd();
+  });
+
+  const waitCode=ms=>new Promise(res=>{const t=setTimeout(()=>{waiter=null;res(0x86);},ms);waiter=c=>{clearTimeout(t);res(c);};});
+  const onN=ev=>{const c=ev.target.value.getUint8(0);if(waiter){const w=waiter;waiter=null;w(c);}};
+
+  async function run(){
+    if(!(ready()&&bin&&!OTA.busy))return;
+    OTA.busy=true;OTA.cancel=false;T.queue.length=0;upd();say('');
+    prog.hidden=false;draw(0);spd.textContent='';eta.textContent='';sent.textContent='Menyiapkan';
+    let och=null;
+    try{
+      while(T.busy)await sleep(20);
+      const svc=await T.dev.gatt.getPrimaryService(SVC);
+      och=await svc.getCharacteristic(OTAC);
+      await och.startNotifications();och.addEventListener('characteristicvaluechanged',onN);
+      const wr=u=>och.writeValueWithResponse(u);
+      const pw=new TextEncoder().encode(pass.value);
+      const head=new Uint8Array(9+pw.length),dv=new DataView(head.buffer);
+      head[0]=0x42;dv.setUint32(1,bin.length,true);dv.setUint32(5,crc,true);head.set(pw,9);
+      const first=waitCode(8000);await wr(head);
+      const code=await first;
+      if(code!==0x01)throw new Error(OERR[code]||'Balasan tidak dikenal ('+code+').');
+      const t0=performance.now();
+      for(let off=0;off<bin.length;off+=OCHUNK){
+        if(OTA.cancel)throw new Error('Update dibatalkan.');
+        const n=Math.min(OCHUNK,bin.length-off),pkt=new Uint8Array(1+n);pkt[0]=0x44;pkt.set(bin.subarray(off,off+n),1);
+        await wr(pkt);
+        const done=off+n,sec=(performance.now()-t0)/1000;
+        draw(done/bin.length);sent.textContent=fmtSz(done)+' dari '+fmtSz(bin.length);
+        if(sec>1){const bps=done/sec,left=Math.ceil((bin.length-done)/bps);
+          spd.textContent=(bps/1024).toFixed(1)+' KB/dtk';eta.textContent='sisa '+Math.floor(left/60)+':'+String(left%60).padStart(2,'0');}
+      }
+      const fin=waitCode(20000);await wr(new Uint8Array([0x45]));
+      const end=await fin;
+      if(end!==0x02)throw new Error(OERR[end]||'Balasan tidak dikenal ('+end+').');
+      draw(1);eta.textContent='';sent.textContent='Terkirim';
+      say('Firmware terpasang. DSP restart sendiri dalam beberapa detik, lalu aplikasi tersambung kembali otomatis.','good');
+    }catch(e){
+      if(och){try{await och.writeValueWithResponse(new Uint8Array([0x58]));}catch(_){}}
+      const nf=e&&e.name==='NotFoundError';
+      say(nf?'DSP ini belum punya fitur update. Flash firmware terbaru lewat kabel dulu.':(e.message||String(e)),'err');
+      sent.textContent='Gagal';
+    }finally{
+      waiter=null;
+      if(och){try{och.removeEventListener('characteristicvaluechanged',onN);}catch(_){}}
+      OTA.busy=false;OTA.cancel=false;upd();
+      if(T.connected){needE=true;S.ver=-1;enqueue('pG','G');}
+    }
+  }
+  go.onclick=run;stop.onclick=()=>{OTA.cancel=true;};
+
+  box.append(h('div',{class:'card gold'},chHead('Update firmware'),
+    h('p',{class:'note',style:'margin:0 0 4px',text:'Kirim file .ino.bin ke DSP lewat Bluetooth. Selama update, keluaran audio dibisukan dan layar TFT menampilkan persen kemajuan.'}),
+    state,
+    h('label',{class:'ota-lbl',for:'otaFile',text:'File firmware (.ino.bin)'}),file,info,
+    h('label',{class:'ota-lbl',for:'otaPass',text:'Sandi update'}),pass,
+    h('div',{class:'btnrow',style:'margin-top:14px'},go),
+    prog,msg,
+    h('p',{class:'note',style:'margin-top:12px',text:'Cara ambil file: di Arduino IDE pilih Sketch, Export Compiled Binary, lalu pakai file berakhiran .ino.bin (bukan bootloader, partitions, atau merged). Salin ke HP sebelum memilihnya di sini.'})));
 })();
 
 /* ====================== Tab & start ====================== */
