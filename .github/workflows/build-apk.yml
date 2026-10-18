@@ -1,5 +1,12 @@
 name: Build APK
 
+# Syarat di repo:
+#   - package.json (Vite + Capacitor 7 + @capacitor-community/bluetooth-le), webDir = dist
+#   - src/bleOta.js          (modul update firmware, dari saya)
+#   - dlms-ltronik.png       (opsional: ikon aplikasi)
+# Tombol "Update Firmware" disisipkan otomatis; kode aplikasi tidak perlu diubah.
+# Jika halaman Anda punya <div id="ota"></div>, panel dipasang di situ dan tombol melayang tidak dibuat.
+
 on:
   push:
     branches: [main, master]
@@ -8,6 +15,9 @@ on:
 
 permissions:
   contents: write
+
+env:
+  BLEOTA_PATH: src/bleOta.js
 
 jobs:
   build:
@@ -27,17 +37,100 @@ jobs:
           distribution: temurin
           java-version: '21'
 
+      - name: Cek file bleOta
+        run: |
+          test -f "$BLEOTA_PATH" || { echo "ERROR: $BLEOTA_PATH tidak ditemukan. Salin bleOta.js ke folder src/"; exit 1; }
+
       - name: Install dependencies
         run: |
           npm install
-          # Plugin BLE untuk fitur update firmware (hapus baris ini jika sudah ada di package.json)
-          npm install @capacitor-community/bluetooth-le
+          # Plugin BLE (@capacitor-community/bluetooth-le) sudah ada di package.json
+          npm install --no-save esbuild
 
       - name: Build web
         run: npm run build
 
+      - name: Cari folder web (webDir)
+        run: |
+          python3 - <<'PY'
+          import os, re, glob
+
+          web = None
+          for cfg in glob.glob("capacitor.config.*"):
+              m = re.search(r"webDir\s*[:=]\s*['\"]([^'\"]+)['\"]", open(cfg, encoding="utf-8").read())
+              if m:
+                  web = m.group(1)
+                  break
+          if not web or not os.path.isfile(os.path.join(web, "index.html")):
+              for d in ["dist", "build", "www", "public"]:
+                  if os.path.isfile(os.path.join(d, "index.html")):
+                      web = d
+                      break
+          if not web:
+              raise SystemExit("ERROR: folder web dengan index.html tidak ditemukan setelah build")
+          print("webDir =", web)
+          open(os.environ["GITHUB_ENV"], "a").write("WEBDIR=%s\n" % web)
+          PY
+
+      - name: Pasang bleOta (tombol Update Firmware)
+        run: |
+          mkdir -p .ota
+          cat > .ota/entry.js <<'EOF'
+          import { mountOtaPanel } from '__BLEOTA__';
+
+          const init = () => {
+            if (document.getElementById('ota-fab')) return;
+            const host = document.getElementById('ota');
+            if (host) { mountOtaPanel(host); return; }
+
+            const fab = document.createElement('button');
+            fab.id = 'ota-fab';
+            fab.textContent = 'Update Firmware';
+            fab.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:99999;padding:12px 16px;border:0;border-radius:24px;background:#7c3aed;color:#fff;font:600 14px system-ui';
+
+            const ov = document.createElement('div');
+            ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:100000;background:#111;color:#eee;overflow:auto;padding:16px;box-sizing:border-box;font-family:system-ui';
+            const close = document.createElement('button');
+            close.textContent = 'Tutup';
+            close.style.cssText = 'padding:10px 16px;margin-bottom:12px';
+            const box = document.createElement('div');
+            ov.append(close, box);
+            document.body.append(fab, ov);
+
+            mountOtaPanel(box);
+            fab.onclick = () => { ov.style.display = 'block'; };
+            close.onclick = () => { ov.style.display = 'none'; };
+          };
+
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+          else init();
+          EOF
+          sed -i "s#__BLEOTA__#$GITHUB_WORKSPACE/$BLEOTA_PATH#" .ota/entry.js
+
+          npx esbuild .ota/entry.js --bundle --minify --format=iife --outfile="$WEBDIR/ota.bundle.js"
+
+          python3 - <<'PY'
+          import os, re
+
+          idx = os.path.join(os.environ["WEBDIR"], "index.html")
+          s = open(idx, encoding="utf-8").read()
+          tag = '<script src="ota.bundle.js"></script>'
+          if "ota.bundle.js" not in s:
+              if re.search(r"</body>", s, re.I):
+                  s = re.sub(r"</body>", tag + "</body>", s, count=1, flags=re.I)
+              else:
+                  s += tag
+              open(idx, "w", encoding="utf-8").write(s)
+          print("bleOta terpasang di", idx)
+          PY
+
       - name: Setup Android
-        run: npx cap add android
+        run: |
+          if [ -d android ]; then
+            echo "Folder android sudah ada, dipakai apa adanya"
+          else
+            npx cap add android
+          fi
 
       - name: Izin Bluetooth di AndroidManifest
         run: |
@@ -57,8 +150,7 @@ jobs:
           """
 
           if "BLUETOOTH_CONNECT" not in s:
-              s = s.replace("</manifest>", perms + "</manifest>")
-              p.write_text(s)
+              p.write_text(s.replace("</manifest>", perms + "</manifest>"))
               print("Izin Bluetooth ditambahkan.")
           else:
               print("Izin Bluetooth sudah ada.")
@@ -67,7 +159,7 @@ jobs:
       - name: Sync Android
         run: npx cap sync android
 
-      - name: Pasang ikon DLMS L-Tronik
+      - name: Pasang ikon
         run: |
           python3 -m pip install Pillow
 
@@ -76,46 +168,29 @@ jobs:
           from pathlib import Path
 
           src = Path("dlms-ltronik.png")
-
           if not src.exists():
-              raise SystemExit("ERROR: File dlms-ltronik.png tidak ditemukan")
+              print("dlms-ltronik.png tidak ada, memakai ikon bawaan.")
+              raise SystemExit(0)
 
           img = Image.open(src).convert("RGBA")
-
-          sizes = {
-              "mipmap-mdpi": 48,
-              "mipmap-hdpi": 72,
-              "mipmap-xhdpi": 96,
-              "mipmap-xxhdpi": 144,
-              "mipmap-xxxhdpi": 192,
-          }
-
+          sizes = {"mipmap-mdpi": 48, "mipmap-hdpi": 72, "mipmap-xhdpi": 96,
+                   "mipmap-xxhdpi": 144, "mipmap-xxxhdpi": 192}
           res = Path("android/app/src/main/res")
 
           for folder, size in sizes.items():
               target = res / folder
               target.mkdir(parents=True, exist_ok=True)
-
-              icon = ImageOps.fit(
-                  img,
-                  (size, size),
-                  method=Image.Resampling.LANCZOS
-              )
-
+              icon = ImageOps.fit(img, (size, size), method=Image.Resampling.LANCZOS)
               icon.save(target / "ic_launcher.png")
               icon.save(target / "ic_launcher_round.png")
 
           # Hapus ikon adaptif bawaan agar ikon PNG baru digunakan.
-          for folder in [
-              res / "mipmap-anydpi-v26",
-              res / "mipmap-anydpi",
-          ]:
+          for folder in [res / "mipmap-anydpi-v26", res / "mipmap-anydpi"]:
               for name in ["ic_launcher.xml", "ic_launcher_round.xml"]:
                   path = folder / name
                   if path.exists():
                       path.unlink()
-
-          print("Ikon DLMS L-Tronik berhasil dipasang.")
+          print("Ikon berhasil dipasang.")
           PY
 
       - name: Build APK
@@ -125,17 +200,17 @@ jobs:
           ./gradlew assembleDebug
 
       - name: Rename APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk DLMS-L-Tronik.apk
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk LTRONIK-DSP.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DLMS-L-Tronik-APK
-          path: DLMS-L-Tronik.apk
+          name: LTRONIK-DSP-APK
+          path: LTRONIK-DSP.apk
           if-no-files-found: error
 
       - name: Attach APK to release (tag v*)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: DLMS-L-Tronik.apk
+          files: LTRONIK-DSP.apk
