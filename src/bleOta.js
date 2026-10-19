@@ -39,7 +39,9 @@ function crc32(buf) {
 }
 const le32 = (n) => [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255];
 
-export async function otaUpdate(firmware, { password = DEFAULT_PASS, onLog = () => {}, onProgress = () => {} } = {}) {
+const DROP = -1; // penanda: koneksi BLE terputus
+
+export async function otaUpdate(firmware, { password = DEFAULT_PASS, onLog = () => {}, onProgress = () => {}, onDone = () => {} } = {}) {
   if (firmware.length < 65536) throw new Error('File terlalu kecil, bukan firmware .bin yang benar');
 
   await BleClient.initialize({ androidNeverForLocation: true });
@@ -47,10 +49,12 @@ export async function otaUpdate(firmware, { password = DEFAULT_PASS, onLog = () 
   const id = dev.deviceId;
 
   let status = null;
+  let dropped = false;
   const waitStatus = async (ms) => {
     const t0 = Date.now();
     while (Date.now() - t0 < ms) {
       if (status !== null) return status;
+      if (dropped) return DROP;
       await sleep(30);
     }
     return null;
@@ -63,7 +67,7 @@ export async function otaUpdate(firmware, { password = DEFAULT_PASS, onLog = () 
     throw new Error(ERR[s] || 'Error 0x' + s.toString(16));
   };
 
-  await BleClient.connect(id, () => onLog('Koneksi terputus'));
+  await BleClient.connect(id, () => { dropped = true; onLog('Koneksi terputus'); });
   onLog('Terhubung ke ' + (dev.name || id));
 
   try {
@@ -85,14 +89,31 @@ export async function otaUpdate(firmware, { password = DEFAULT_PASS, onLog = () 
       pkt[0] = 0x44;
       pkt.set(part, 1);
       await BleClient.write(id, SVC, OTA, new DataView(pkt.buffer));
+      if (dropped) throw new Error('Koneksi terputus saat mengirim data');
       if (status !== null && status >= 0x81) throw new Error(ERR[status] || 'Error DSP');
       onProgress(Math.round(((i + part.length) * 100) / firmware.length));
     }
 
     // Selesai: 'E' -> DSP verifikasi CRC, pasang, lalu restart
-    await BleClient.write(id, SVC, OTA, dv([0x45]));
-    await expect(0x02, 15000, 'selesai');
-    onLog('Sukses! DSP restart dengan firmware baru.');
+    onProgress(100);
+    onLog('Data terkirim, DSP memverifikasi & memasang firmware...');
+    try {
+      await BleClient.write(id, SVC, OTA, dv([0x45]), { timeout: 20000 });
+    } catch (e) {
+      if (!dropped && status === null) throw e;   // DSP bisa restart/putus sebelum balasan write tiba: itu wajar
+    }
+    const s = await waitStatus(20000);
+    status = null;
+    if (s === 0x02) {
+      onLog('Sukses! DSP restart dengan firmware baru.');
+    } else if (s === DROP) {
+      onLog('DSP restart (koneksi terputus) - update dianggap selesai. Cek versi di menu System.');
+    } else if (s === null) {
+      throw new Error('DSP tidak membalas setelah 100%. Cek versi firmware di menu System.');
+    } else {
+      throw new Error(ERR[s] || 'Error 0x' + s.toString(16));
+    }
+    onDone();
   } catch (e) {
     try { await BleClient.write(id, SVC, OTA, dv([0x58])); } catch (_) {} // 'X' batal
     throw e;
@@ -122,6 +143,7 @@ export function mountOtaPanel(el) {
     try {
       const data = new Uint8Array(await f.arrayBuffer());
       await otaUpdate(data, { password: $('#otaPass').value, onLog: log, onProgress: (p) => { $('#otaBar').value = p; } });
+      log('SELESAI. Tunggu DSP menyala ulang.');
     } catch (e) {
       log('Gagal: ' + (e.message || e));
     }
