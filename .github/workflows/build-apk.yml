@@ -4,8 +4,8 @@ name: Build APK
 #   - package.json (Vite + Capacitor 7 + @capacitor-community/bluetooth-le), webDir = dist
 #   - src/bleOta.js          (modul update firmware, dari saya)
 #   - dlms-ltronik.png       (opsional: ikon aplikasi)
-# Tombol "Update Firmware" disisipkan otomatis; kode aplikasi tidak perlu diubah.
-# Jika halaman Anda punya <div id="ota"></div>, panel dipasang di situ dan tombol melayang tidak dibuat.
+# Update firmware ada di menu System (index.html) dan memakai src/native.js -> src/bleOta.js.
+# Tidak ada lagi tombol melayang yang disisipkan saat build.
 
 on:
   push:
@@ -45,7 +45,6 @@ jobs:
         run: |
           npm install
           # Plugin BLE (@capacitor-community/bluetooth-le) sudah ada di package.json
-          npm install --no-save esbuild
 
       - name: Build web
         run: npm run build
@@ -70,58 +69,6 @@ jobs:
               raise SystemExit("ERROR: folder web dengan index.html tidak ditemukan setelah build")
           print("webDir =", web)
           open(os.environ["GITHUB_ENV"], "a").write("WEBDIR=%s\n" % web)
-          PY
-
-      - name: Pasang bleOta (tombol Update Firmware)
-        run: |
-          mkdir -p .ota
-          cat > .ota/entry.js <<'EOF'
-          import { mountOtaPanel } from '__BLEOTA__';
-
-          const init = () => {
-            if (document.getElementById('ota-fab')) return;
-            const host = document.getElementById('ota');
-            if (host) { mountOtaPanel(host); return; }
-
-            const fab = document.createElement('button');
-            fab.id = 'ota-fab';
-            fab.textContent = 'Update Firmware';
-            fab.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:99999;padding:12px 16px;border:0;border-radius:24px;background:#7c3aed;color:#fff;font:600 14px system-ui';
-
-            const ov = document.createElement('div');
-            ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:100000;background:#111;color:#eee;overflow:auto;padding:16px;box-sizing:border-box;font-family:system-ui';
-            const close = document.createElement('button');
-            close.textContent = 'Tutup';
-            close.style.cssText = 'padding:10px 16px;margin-bottom:12px';
-            const box = document.createElement('div');
-            ov.append(close, box);
-            document.body.append(fab, ov);
-
-            mountOtaPanel(box);
-            fab.onclick = () => { ov.style.display = 'block'; };
-            close.onclick = () => { ov.style.display = 'none'; };
-          };
-
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-          else init();
-          EOF
-          sed -i "s#__BLEOTA__#$GITHUB_WORKSPACE/$BLEOTA_PATH#" .ota/entry.js
-
-          npx esbuild .ota/entry.js --bundle --minify --format=iife --outfile="$WEBDIR/ota.bundle.js"
-
-          python3 - <<'PY'
-          import os, re
-
-          idx = os.path.join(os.environ["WEBDIR"], "index.html")
-          s = open(idx, encoding="utf-8").read()
-          tag = '<script src="ota.bundle.js"></script>'
-          if "ota.bundle.js" not in s:
-              if re.search(r"</body>", s, re.I):
-                  s = re.sub(r"</body>", tag + "</body>", s, count=1, flags=re.I)
-              else:
-                  s += tag
-              open(idx, "w", encoding="utf-8").write(s)
-          print("bleOta terpasang di", idx)
           PY
 
       - name: Setup Android
