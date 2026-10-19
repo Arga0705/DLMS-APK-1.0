@@ -776,7 +776,7 @@ function drawSpec(){
   async function runNative(){
     disconnect();await sleep(600);sent.textContent='Pilih perangkat DSP';
     try{
-      await window.NativeOta.otaUpdate(bin,{password:pass.value,onLog:()=>{},
+      await window.NativeOta.otaUpdate(bin,{password:pass.value,onLog:t=>{if(/memverifikasi/i.test(t)){sent.textContent='Memverifikasi & memasang firmware...';eta.textContent='';}},
         onProgress:p=>{draw(p/100);sent.textContent=fmtSz(Math.round(bin.length*p/100))+' dari '+fmtSz(bin.length);}});
       draw(1);sent.textContent='Terkirim';
       say('Firmware terpasang. DSP restart sendiri dalam beberapa detik, lalu aplikasi tersambung kembali otomatis.','good');
@@ -811,8 +811,10 @@ function drawSpec(){
         if(sec>1){const bps=done/sec,left=Math.ceil((bin.length-done)/bps);
           spd.textContent=(bps/1024).toFixed(1)+' KB/dtk';eta.textContent='sisa '+Math.floor(left/60)+':'+String(left%60).padStart(2,'0');}
       }
-      const fin=waitCode(20000);await wr(new Uint8Array([0x45]));
-      const end=await fin;
+      const fin=waitCode(20000);sent.textContent='Memverifikasi & memasang firmware...';eta.textContent='';
+      try{await wr(new Uint8Array([0x45]));}catch(e2){if(T.dev&&T.dev.gatt&&T.dev.gatt.connected)throw e2;}
+      let end=await fin;
+      if(end===0x86&&!(T.dev&&T.dev.gatt&&T.dev.gatt.connected))end=0x02;
       if(end!==0x02)throw new Error(OERR[end]||'Balasan tidak dikenal ('+end+').');
       draw(1);eta.textContent='';sent.textContent='Terkirim';
       say('Firmware terpasang. DSP restart sendiri dalam beberapa detik, lalu aplikasi tersambung kembali otomatis.','good');
