@@ -1,4 +1,4 @@
-name: Build APK
+name: Build APK 
 
 # Syarat di repo:
 #   - package.json (Vite + Capacitor 7 + @capacitor-community/bluetooth-le), webDir = dist
