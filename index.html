@@ -50,7 +50,7 @@ header{flex:none;background:linear-gradient(180deg,#171063,#0d0740);border-botto
 main{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 14px 20px;-webkit-overflow-scrolling:touch;background:radial-gradient(1200px 500px at 50% -100px,#12094a55,transparent)}
 .wrap{max-width:880px;margin:0 auto}
 section.tab{display:none}section.tab.on{display:block}
-section#t-eq,section#t-xover{--c:var(--oc)}
+section#t-eq,section#t-xover,section#t-dyn{--c:var(--oc)}
 .card{background:linear-gradient(160deg,var(--c1),var(--c2));border:1.5px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 0 22px #1a0f6a44}
 .card.gold{border-color:#8c7420;box-shadow:0 0 22px #ffc01f14}
 .chead{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
@@ -134,8 +134,8 @@ select.ghost{padding-right:6px}select.ghost option{background:#150c4c}
 
 /* ---------- EQ / kurva ---------- */
 canvas{display:block;width:100%}
-#eqCurve,#xoCurve{background:var(--deep);border:1px solid #1b1763;border-radius:10px}
-#eqCurve{height:160px;margin-bottom:10px}#xoCurve{height:170px}
+#eqCurve,#xoCurve,#dynCurve{background:var(--deep);border:1px solid #1b1763;border-radius:10px}
+#eqCurve{height:160px;margin-bottom:10px}#xoCurve{height:170px}#dynCurve{height:200px}
 .legend{display:flex;gap:14px;font-size:12px;color:var(--dim);margin-top:10px;flex-wrap:wrap;font-weight:700}
 .legend i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
 .faders{display:grid;grid-template-columns:repeat(10,1fr);gap:2px}
@@ -165,13 +165,22 @@ nav button[aria-selected=true]{color:var(--gold);border-color:#8c7420;background
 #toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--gold);color:#2b1d00;font-weight:800;padding:8px 16px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9}
 #toast.on{opacity:1}
 @media (max-width:380px){.fcol .f{font-size:9.5px}.t1 h1{font-size:21px}nav button{font-size:8.5px}}
+.grw{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.grt{flex:1;min-width:120px;height:14px;background:var(--deep);border:1px solid #1b1763;border-radius:8px;overflow:hidden}
+.grt i{display:block;height:100%;width:0;background:var(--warn);box-shadow:0 0 6px #ffc01f66;transition:width .12s}
+.grw b{font-family:var(--mono);font-size:12.5px;min-width:56px;text-align:right}
+.lamp{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line2);border-radius:20px;padding:4px 11px;font-size:11px;font-weight:800;letter-spacing:.05em;color:var(--dim)}
+.lamp b{min-width:0;font-size:11px;font-family:inherit;text-align:left}
+.lamp i{width:9px;height:9px;border-radius:50%;background:var(--off)}
+.lamp.open{color:var(--ok);border-color:#1f9d57}.lamp.open i{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.lamp.closed{color:var(--bad);border-color:#a3243c}.lamp.closed i{background:var(--bad);box-shadow:0 0 8px var(--bad)}
+@media (max-width:420px){nav button{font-size:8px;letter-spacing:0}nav button .ic{font-size:18px}}
+.fld{background:var(--deep);border:1px solid var(--line2);border-radius:9px;color:var(--text);padding:6px 11px;min-height:36px;font:inherit;width:150px}
+.fld:focus-visible{outline:2px solid var(--gold)}
+.upd .grt i{background:var(--gold);box-shadow:0 0 6px #ffc01f66}
+.upd .grt.err i{background:var(--bad)}.upd .grt.ok i{background:var(--ok)}
+.upd ol{margin:6px 0 12px;padding-left:20px;color:var(--dim);font-size:12.5px}.upd li{margin:3px 0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-#dynCurve{height:250px;background:var(--deep);border:1px solid #1b1763;border-radius:10px;width:100%;display:block}
-.gm{display:flex;align-items:center;gap:8px;margin:10px 0 0;font-size:12px;color:var(--dim)}
-.gm label{width:34px;font-weight:700}.gm .tr{flex:1;height:10px;border-radius:6px;background:var(--deep);border:1px solid #1b1763;overflow:hidden;position:relative}
-.gm .tr i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--warn);transition:width .12s}
-.gm b{width:64px;text-align:right;color:var(--text);font-variant-numeric:tabular-nums}
-nav button{font-size:9px}
 </style>
 </head>
 <body>
@@ -181,7 +190,7 @@ nav button{font-size:9px}
   <div class="ttl">
     <div class="t1"><h1>DSP PRO</h1><span class="badge">ANDROID</span></div>
     <div class="t2">L-TRONIK AUDIO PROCESSOR</div>
-    <div class="t3">2 IN 4 OUT • 10 BAND EQ • COMP • GATE • X-OVER • DELAY</div>
+    <div class="t3">2 IN 4 OUT • 10 BAND EQ • X-OVER • COMP/GATE • DELAY</div>
   </div>
   <div class="acts">
     <span class="pill" id="pill"><i class="dot" id="dot"></i><b id="stxt">Offline</b></span>
@@ -202,8 +211,6 @@ nav button{font-size:9px}
   <div class="card">
     <div class="chead"><span class="bar"></span><h2>EQ 10 Band</h2><div class="rt" id="eqSel"></div></div>
     <canvas id="eqCurve"></canvas>
-    <div class="line"><label>Spektrum</label><div id="eqSpecOn"></div></div>
-    <div class="line"><label>Sumber</label><div id="eqSpecSrc"></div></div>
     <div class="faders" id="faders"></div>
     <p class="note" style="text-align:center">Geser untuk gain. Ketuk dua kali untuk 0 dB. Ketuk frekuensi untuk memilih band.</p>
   </div>
@@ -212,16 +219,9 @@ nav button{font-size:9px}
     <div class="line" id="eqCopy" style="margin-bottom:0"></div></div>
 </section>
 
-<section class="tab" id="t-dyn">
-  <div class="card"><div class="chead"><span class="bar"></span><h2>Compressor &amp; Gate</h2><div class="rt" id="dynSel"></div></div>
-    <canvas id="dynCurve"></canvas>
-    <div class="gm"><label>GR</label><div class="tr"><i id="grBar"></i></div><b id="grTxt">OFF</b></div>
-    <div class="gm"><label>GATE</label><div class="tr"><i id="gtBar"></i></div><b id="gtTxt">OFF</b></div>
-    <p class="note" style="text-align:center">Urutan sinyal: filter/EQ → gate → compressor → delay → gain → limiter. Titik putih = level input saat ini.</p></div>
-  <div style="--c:var(--oc)"><div class="card" id="compBox"></div><div class="card" id="gateBox"></div></div>
-</section>
-
 <section class="tab" id="t-xover"><div id="xoBox"></div></section>
+
+<section class="tab" id="t-dyn"><div id="dynBox"></div></section>
 
 <section class="tab" id="t-delay"><div id="delayBox"></div></section>
 
@@ -242,8 +242,8 @@ nav button{font-size:9px}
   <button role="tab" data-t="home"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg></span>HOME</button>
   <button role="tab" data-t="matrix"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>MATRIX</button>
   <button role="tab" data-t="eq"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg></span>EQ</button>
-  <button role="tab" data-t="dyn"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 20 12 12h9"/><path d="M3 20V4M3 20h18"/></svg></span>DYN</button>
   <button role="tab" data-t="xover"><span class="ic"><svg viewBox="0 0 24 24"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></span>X-OVER</button>
+  <button role="tab" data-t="dyn"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span>DYN</button>
   <button role="tab" data-t="delay"><span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>DELAY</button>
   <button role="tab" data-t="spec"><span class="ic"><svg viewBox="0 0 24 24"><path d="M6 20v-5M12 20V8M18 20V4"/></svg></span>SPEC</button>
   <button role="tab" data-t="preset"><span class="ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></svg></span>PRESET</button>
@@ -290,19 +290,18 @@ let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add
 
 /* ====================== State ====================== */
 const mkCh=()=>({src:0,hpft:0,lpft:0,hpf:20,hps:12,lpf:20000,lps:12,gain:0,dly:0,lim:0.5,phase:0,mute:0,
-  eq:Array(10).fill(0),eqf:[31,63,125,250,500,1000,2000,4000,8000,16000],eqq:Array(10).fill(1.4),
-  d:{cOn:0,cThr:-20,cRat:4,cAtk:10,cRel:100,cKnee:6,cMk:0,gOn:0,gThr:-50,gRng:-40,gHold:50,gRel:100}});
+  eq:Array(10).fill(0),eqf:[31,63,125,250,500,1000,2000,4000,8000,16000],eqq:Array(10).fill(1.4),gthr:-80,grng:60,grel:100,cthr:0,cr:4,catk:10,crel:150,cknee:6,cmk:0});
+const DYNK=['gthr','grng','grel','cthr','cr','catk','crel','cknee','cmk'];   // urutan sama dengan balasan firmware "d<out>|..."
+const dynOf=c=>{const o={};DYNK.forEach(k=>o[k]=c[k]);return o;};
 let S={ver:-1,inL:1,inR:1,chosen:0,specSrc:0,peak:1,tone:0,pink:0,ig:[0,0],il:[0.5,0.5],ch:[mkCh(),mkCh(),mkCh(),mkCh()]};
-const TABS=['home','matrix','eq','dyn','xover','delay','spec','preset','setup'];
+const TABS=['home','matrix','eq','xover','dyn','delay','spec','preset','setup'];
 let cur=0, selBand=0, tab='home', wl=null;
 const LS='ltronik-ui';
 function saveUi(){try{localStorage.setItem(LS,JSON.stringify({tab,cur,selBand}));}catch(e){}}
 try{const u=JSON.parse(localStorage.getItem(LS)||'{}');
   if(TABS.includes(u.tab))tab=u.tab;
   if(u.cur>=0&&u.cur<4)cur=u.cur; if(u.selBand>=0&&u.selBand<10)selBand=u.selBand;}catch(e){}
-let needD=true, dNext=0, eqSpecOn=true, mLast=[0,0,0,0,0,0], liveDyn={gr:[0,0,0,0],gt:[0,0,0,0]};
-try{eqSpecOn=localStorage.getItem('ltronik-eqspec')!=='0';}catch(e){}
-let dragging=false, holdUntil=0, lastLocal=0, needE=true;
+let dragging=false, holdUntil=0, lastLocal=0, needE=true, needD=true, dNext=0;
 const refreshers=[]; const reg=f=>{refreshers.push(f);return f;};
 const refreshAll=()=>{document.documentElement.style.setProperty('--oc',OCOL[cur]);for(const f of refreshers)f();drawEq();};
 
@@ -345,6 +344,7 @@ async function openGatt(){
   T.rx=await svc.getCharacteristic(RXC); T.tx=await svc.getCharacteristic(TXC);
   T.tx.addEventListener('characteristicvaluechanged',e=>onData(T.dec.decode(e.target.value,{stream:true})));
   await T.tx.startNotifications();
+  T.ota=null;try{T.ota=await svc.getCharacteristic(OTAC);T.ota.addEventListener('characteristicvaluechanged',e=>onOta(e.target.value.getUint8(0)));await T.ota.startNotifications();}catch(e){T.ota=null;}   // firmware lama tanpa OTA
   T.mode='ble';T.buf='';T.tries=0;setConnected(true,T.dev.name||'LTRONIK-DSP');
 }
 async function openNative(){
@@ -398,34 +398,41 @@ function handleLine(l){
   else if(c==='s')parseSpec(l);
   else if(c==='e')parseEq(l);
   else if(c==='d')parseDyn(l);
-  else if(c==='y')parseLiveDyn(l);
+  else if(c==='r')parseGr(l);
 }
 function parseState(l){
   const p=l.split('|'); if(p.length<6)return;
   const g=p[1].split(',').map(Number); if(g.length<11||g.some(isNaN))return;
   const n={ver:parseInt(p[0].slice(1),10),inL:g[0],inR:g[1],chosen:g[2],specSrc:g[3],peak:g[4],tone:g[5],pink:g[6],ig:[g[7],g[8]],il:[g[9],g[10]],ch:[]};
   for(let i=0;i<4;i++){const a=p[2+i].split(',').map(Number); if(a.length<22||a.some(isNaN))return;
-    n.ch.push({src:a[0],hpft:a[1],lpft:a[2],hpf:a[3],hps:a[4],lpf:a[5],lps:a[6],gain:a[7],dly:a[8],lim:a[9],phase:a[10],mute:a[11],eq:a.slice(12,22),eqf:S.ch[i].eqf,eqq:S.ch[i].eqq,d:S.ch[i].d});}
+    n.ch.push({src:a[0],hpft:a[1],lpft:a[2],hpf:a[3],hps:a[4],lpf:a[5],lps:a[6],gain:a[7],dly:a[8],lim:a[9],phase:a[10],mute:a[11],eq:a.slice(12,22),eqf:S.ch[i].eqf,eqq:S.ch[i].eqq,...dynOf(S.ch[i])});}
   if(dragging||Date.now()<holdUntil)return;           // jangan timpa saat pengguna sedang mengubah
   const external=n.ver!==S.ver&&Date.now()-lastLocal>2000;
-  S=n; if(external||S._first===undefined){needE=needD=true;} S._first=1;
+  S=n; if(external||S._first===undefined){needE=true;needD=true;} S._first=1;
   refreshAll();
 }
 function parseMeter(l){
   const d=l.slice(1); if(d.length<12)return;
   const v=[];for(let i=0;i<6;i++)v.push(clamp(parseInt(d.substr(i*2,2),10)||0,0,99));
-  mLast=v;
   for(let i=0;i<4;i++)METER.o[i]&&METER.o[i].set(v[i]);
-  if(tab==='dyn')drawDyn();
   for(let i=0;i<2;i++)METER.i[i]&&METER.i[i].set(v[4+i]);
 }
 const METER={o:[],i:[]};
+let grV=[0,0,0,0], gOpen=[1,1,1,1], updateGr=()=>{};   // gain reduction (dB, positif) & status gate tiap output
+function parseGr(l){const d=l.slice(1);if(d.length<12)return;
+  for(let i=0;i<4;i++){grV[i]=clamp(parseInt(d.substr(i*2,2),10)||0,0,99);gOpen[i]=d[8+i]==='1';}
+  updateGr();}
+function parseDyn(l){const p=l.split('|');if(p.length<2)return;
+  const o=parseInt(p[0].slice(1),10);if(!(o>=0&&o<4))return;
+  const a=p[1].split(',').map(Number);if(a.length<9||a.some(isNaN))return;
+  if(dragging||Date.now()<holdUntil)return;
+  const c=S.ch[o];DYNK.forEach((k,i)=>c[k]=a[i]);refreshAll();}
 function resetMeters(){[...METER.o,...METER.i].forEach(m=>m&&m.reset());}
 let specV=new Array(16).fill(0), specP=new Array(16).fill(0);
 function parseSpec(l){
   const d=l.slice(1); if(d.length<64)return;
   for(let i=0;i<16;i++){specV[i]=clamp(parseInt(d.substr(i*2,2),10)||0,0,99)/99;specP[i]=clamp(parseInt(d.substr(32+i*2,2),10)||0,0,99)/99;}
-  if(tab==='spec')drawSpec();else if(tab==='eq'&&eqSpecOn)drawEq();
+  if(tab==='spec')drawSpec();else if(tab==='eq')drawEq();
 }
 function parseEq(l){
   const p=l.split('|'); if(p.length<3)return;
@@ -436,29 +443,15 @@ function parseEq(l){
   S.ch[o].eqf=f;S.ch[o].eqq=q;refreshAll();
 }
 
-function parseDyn(l){   // d<out>|cOn,cThr,cRat,cAtk,cRel,cKnee,cMk|gOn,gThr,gRng,gHold,gRel
-  const p=l.split('|'); if(p.length<3)return;
-  const o=parseInt(p[0].slice(1),10); if(!(o>=0&&o<4))return;
-  const a=p[1].split(',').map(Number), b=p[2].split(',').map(Number);
-  if(a.length<7||b.length<5||a.some(isNaN)||b.some(isNaN))return;
-  if(dragging||Date.now()<holdUntil)return;
-  const d=S.ch[o].d; [d.cOn,d.cThr,d.cRat,d.cAtk,d.cRel,d.cKnee,d.cMk]=a; [d.gOn,d.gThr,d.gRng,d.gHold,d.gRel]=b;
-  refreshAll();
-}
-function parseLiveDyn(l){   // y + per output: GR(2 digit, dB) + gain gate(2 digit, 00-99)
-  for(let i=0;i<4;i++){liveDyn.gr[i]=-(parseInt(l.substr(1+i*4,2),10)||0);liveDyn.gt[i]=(parseInt(l.substr(3+i*4,2),10)||0)/99;}
-  if(tab==='dyn')drawDyn();
-}
-
 /* ====================== Polling ====================== */
 let tick=0,eqNext=0;
 setInterval(()=>{
-  if(!T.connected||document.hidden)return;
+  if(!T.connected||document.hidden||OTA.busy)return;
   tick++;
   if(T.queue.length<3){
-    if(tab==='home'||tab==='dyn')enqueue('pM','M');
-    if(tab==='dyn')enqueue('pY','Y');
-    if(tab==='spec'||(tab==='eq'&&eqSpecOn))enqueue('pP','P');
+    if(tab==='home')enqueue('pM','M');
+    if(tab==='spec'||tab==='eq')enqueue('pP','P');
+    if(tab==='dyn')enqueue('pR','R');
     if(tick%6===0)enqueue('pG','G'+(S.ver>=0?S.ver:''));
     if(needD&&tick%2===1){enqueue('pD'+dNext,'D'+dNext);dNext++;if(dNext>3){dNext=0;needD=false;}}
     if(needE&&tick%2===0){enqueue('pE'+eqNext,'E'+eqNext);eqNext++;if(eqNext>3){eqNext=0;needE=false;}}
@@ -497,7 +490,7 @@ function toggle(get,set,labels,cls){
   reg(()=>{const on=!!get();b.setAttribute('aria-pressed',on);b.textContent=on?labels[1]:labels[0];});
   return b;
 }
-const chSel=()=>seg(['1','2','3','4'],()=>cur,i=>{cur=i;saveUi();});
+const chSel=()=>seg(['1','2','3','4'],()=>cur,i=>{cur=i;saveUi();if(tab==='eq'&&T.connected)sendNow('spec.eq',cur+1);});
 function dynSeg(getOpts,get,set){   // segmen yang pilihannya berubah (slope tergantung tipe)
   const el=h('div',{class:'seg'});
   reg(()=>{const o=getOpts();if(el.children.length!==o.length||el.dataset.k!==o.join()){el.textContent='';el.dataset.k=o.join();
@@ -599,6 +592,44 @@ const chHead=(title,rightEl)=>h('div',{class:'chead'},h('span',{class:'bar'}),h(
   const wrap=h('div',{style:'--c:var(--oc)'});wrap.append(filt('High-pass (HPF)','hp'),filt('Low-pass (LPF)','lp'));box.append(wrap);
 })();
 
+/* ---------- DYN (Comp / Gate) ---------- */
+const RATV=[1.5,2,3,4,6,8,10,20,100], RATL=['1.5','2','3','4','6','8','10','20','∞'];
+const DYN_DEF={gthr:-80,grng:60,grel:100,cthr:0,cr:4,catk:10,crel:150,cknee:6,cmk:0};
+const DYN_KEY={gthr:'gthr',grng:'grng',grel:'grel',cthr:'cthr',cr:'cratio',catk:'catk',crel:'crel',cknee:'cknee',cmk:'cmk'};
+function compGr(lv,T_,W,s){const ov=lv-T_;if(W<.5)return ov>0?s*ov:0;if(2*ov<-W)return 0;if(2*ov>W)return s*ov;const t=ov+W/2;return s*t*t/(2*W);}
+function dynOut(c,x){let y=x;if(c.gthr>-80&&x<c.gthr)y-=c.grng;
+  if(c.cthr<0)y+=compGr(y,c.cthr,c.cknee,1/c.cr-1)+c.cmk;return y;}
+(()=>{const box=$('#dynBox');
+  const grFill=h('i'),grTxt=h('b',{text:'0 dB'}),lamp=h('span',{class:'lamp'},h('i'),h('b',{text:'GATE OFF'}));
+  const lg=h('div',{class:'legend'},h('span',{},h('i',{style:'background:#22d3ee'}),'Threshold gate'),h('span',{},h('i',{style:'background:#ffc01f'}),'Threshold kompresor'));
+  box.append(h('div',{class:'card'},chHead('Comp / Gate',chSel()),h('canvas',{id:'dynCurve'}),lg,
+    h('div',{class:'grw'},h('span',{class:'ml',text:'GR'}),h('div',{class:'grt'},grFill),grTxt,lamp),
+    h('p',{class:'note',text:'Kurva: level masuk (sumbu X) ke level keluar (sumbu Y), dalam dB. GR adalah pengurangan gain kompresor.'})));
+  updateGr=()=>{const c=C(),g=c.cthr<0?grV[cur]:0;grFill.style.width=clamp(g/24*100,0,100)+'%';grTxt.textContent=g?'-'+g+' dB':'0 dB';
+    const off=c.gthr<=-80;lamp.className='lamp '+(off?'':(gOpen[cur]?'open':'closed'));lamp.querySelector('b').textContent=off?'GATE OFF':(gOpen[cur]?'GATE BUKA':'GATE TUTUP');};
+  reg(updateGr);
+  const set=(k,v)=>{C()[k]=v;send(`o${N()}.${DYN_KEY[k]}`,v);};
+  const wrap=h('div',{style:'--c:var(--oc)'});
+  wrap.append(
+    h('div',{class:'card'},chHead('Noise gate'),
+      slider({label:'Threshold',min:-80,max:-10,step:1,get:()=>C().gthr,fmt:v=>v<=-80?'OFF':v.toFixed(0)+' dB',onSet:v=>set('gthr',v)}),
+      slider({label:'Release',min:10,max:2000,step:10,get:()=>C().grel,fmt:v=>v.toFixed(0)+' ms',onSet:v=>set('grel',v)}),
+      slider({label:'Range (redaman)',min:6,max:80,step:1,get:()=>C().grng,fmt:v=>'-'+v.toFixed(0)+' dB',onSet:v=>set('grng',v)}),
+      h('p',{class:'note',text:'Threshold -80 dB berarti gate mati. Sinyal di bawah threshold diredam sebesar Range.'})),
+    h('div',{class:'card'},chHead('Kompresor'),
+      slider({label:'Threshold',min:-60,max:0,step:1,get:()=>C().cthr,fmt:v=>v>=0?'OFF':v.toFixed(0)+' dB',onSet:v=>set('cthr',v)}),
+      h('div',{class:'line'},h('label',{text:'Ratio'}),seg(RATL,()=>RATV.indexOf(C().cr),i=>{C().cr=RATV[i];send(`o${N()}.cratio`,RATV[i]);})),
+      slider({label:'Attack',min:1,max:200,step:1,get:()=>C().catk,fmt:v=>v.toFixed(0)+' ms',onSet:v=>set('catk',v)}),
+      slider({label:'Release',min:10,max:2000,step:10,get:()=>C().crel,fmt:v=>v.toFixed(0)+' ms',onSet:v=>set('crel',v)}),
+      slider({label:'Knee',min:0,max:12,step:1,get:()=>C().cknee,fmt:v=>v.toFixed(0)+' dB',onSet:v=>set('cknee',v)}),
+      slider({label:'Makeup gain',min:0,max:24,step:0.5,get:()=>C().cmk,fmt:v=>'+'+v.toFixed(1)+' dB',onSet:v=>set('cmk',v)}),
+      h('p',{class:'note',text:'Threshold 0 dB berarti kompresor mati. Makeup hanya bekerja saat kompresor aktif.'}),
+      h('hr'),
+      h('button',{class:'ghost',type:'button',text:'Reset gate dan kompresor output '+'ini',onclick:()=>{
+        for(const k of DYNK){C()[k]=DYN_DEF[k];send(`o${N()}.${DYN_KEY[k]}`,DYN_DEF[k]);}refreshAll();toast('Gate dan kompresor output '+N()+' direset');}})));
+  box.append(wrap);
+})();
+
 /* ---------- DELAY ---------- */
 (()=>{const box=$('#delayBox'),g=h('div',{class:'grid2'});
   for(let i=0;i<4;i++)g.append(h('div',{class:'card',style:'--c:'+OCOL[i]},chHead('Output '+(i+1)),
@@ -656,11 +687,11 @@ function drawEq(){
   drawXo();drawDyn();
   if(tab!=='eq')return;const f=fitCanvas(eqCv);if(!f)return;const {x,w,h:H}=f;
   x.clearRect(0,0,w,H);const X=hz=>fromF(hz)/1000*w, Y=db=>H/2-db/15*(H/2);
-  if(eqSpecOn){const g=x.createLinearGradient(0,H,0,0);g.addColorStop(0,col('--ok'));g.addColorStop(.7,col('--ok'));g.addColorStop(.85,col('--warn'));g.addColorStop(1,col('--bad'));
-    for(let i=0;i<16;i++){const x0=X(SPF[i]/1.26)+1,x1=X(SPF[i]*1.26)-1,bh=specV[i]*H*.92;
-      x.globalAlpha=.30;x.fillStyle=g;x.fillRect(x0,H-bh,Math.max(2,x1-x0),bh);
-      if(S.peak&&specP[i]>.03){x.globalAlpha=.55;x.fillStyle=col('--text');x.fillRect(x0,H-specP[i]*H*.92-1.5,Math.max(2,x1-x0),1.5);}}
-    x.globalAlpha=1;}
+  for(let i=0;i<16;i++){   // spektrum (RTA) sebagai latar kurva EQ
+    const lo=i?Math.sqrt(SPF[i-1]*SPF[i]):20,hi=i<15?Math.sqrt(SPF[i]*SPF[i+1]):20000,xa=X(lo),bw=Math.max(1,X(hi)-xa-1),v=specV[i];
+    if(v>0){x.globalAlpha=.38;x.fillStyle='hsl('+Math.round(190+v*110)+',80%,60%)';x.fillRect(xa,H-H*v,bw,H*v);x.globalAlpha=1;}
+    if(S.peak&&specP[i]>0){x.fillStyle=col('--dim');x.fillRect(xa,H-H*specP[i],bw,1.5);}}
+  x.textAlign='right';x.font='10px system-ui';x.fillStyle=col('--dim');x.fillText('RTA Out '+(cur+1),w-6,12);x.textAlign='left';
   x.lineWidth=1;x.font='10px system-ui';x.fillStyle=col('--dim');x.strokeStyle=col('--line');
   [-12,-6,0,6,12].forEach(d=>{x.globalAlpha=d===0?.9:.45;x.beginPath();x.moveTo(0,Y(d)+.5);x.lineTo(w,Y(d)+.5);x.stroke();x.globalAlpha=1;x.fillText((d>0?'+':'')+d,3,Y(d)-2);});
   [50,100,500,1000,5000,10000].forEach(hz=>{x.globalAlpha=.45;x.beginPath();x.moveTo(X(hz)+.5,0);x.lineTo(X(hz)+.5,H);x.stroke();x.globalAlpha=1;x.fillText(fmtHzS(hz),X(hz)+3,H-3);});
@@ -701,6 +732,22 @@ function drawXo(){
     for(let px=0;px<=w;px+=2){const y=Y(chResp(c,toF(px/w*1000)));px?x.lineTo(px,y):x.moveTo(px,y);}
     x.strokeStyle=OCOL[i];x.lineWidth=i===cur?2.8:1.4;x.globalAlpha=c.mute?.25:(i===cur?1:.6);x.stroke();x.globalAlpha=1;});
 }
+function drawDyn(){
+  if(tab!=='dyn')return;const cv=$('#dynCurve');if(!cv)return;const f=fitCanvas(cv);if(!f)return;const {x,w,h:H}=f;
+  x.clearRect(0,0,w,H);const l=34,t=8,r=10,b=20,pw=w-l-r,ph=H-t-b,X=db=>l+(db+60)/60*pw,Y=db=>t+(0-clamp(db,-60,0))/60*ph;
+  x.lineWidth=1;x.font='10px system-ui';x.fillStyle=col('--dim');x.strokeStyle=col('--line2');
+  for(let d=-60;d<=0;d+=10){x.globalAlpha=d===0?.9:.5;x.beginPath();x.moveTo(l,Y(d)+.5);x.lineTo(l+pw,Y(d)+.5);x.stroke();
+    x.beginPath();x.moveTo(X(d)+.5,t);x.lineTo(X(d)+.5,t+ph);x.stroke();x.globalAlpha=1;
+    x.textAlign='right';x.fillText(String(d),l-4,Y(d)+3);x.textAlign='center';x.fillText(String(d),X(d),H-6);}
+  x.textAlign='left';
+  const c=C();
+  x.setLineDash([4,4]);x.strokeStyle=col('--line');x.beginPath();x.moveTo(X(-60),Y(-60));x.lineTo(X(0),Y(0));x.stroke();
+  if(c.gthr>-80){x.strokeStyle='#22d3ee';x.beginPath();x.moveTo(X(c.gthr)+.5,t);x.lineTo(X(c.gthr)+.5,t+ph);x.stroke();}
+  if(c.cthr<0){x.strokeStyle='#ffc01f';x.beginPath();x.moveTo(X(c.cthr)+.5,t);x.lineTo(X(c.cthr)+.5,t+ph);x.stroke();}
+  x.setLineDash([]);
+  x.beginPath();for(let i=0;i<=pw;i+=2){const d=-60+60*i/pw,y=Y(dynOut(c,d));i?x.lineTo(l+i,y):x.moveTo(l+i,y);}
+  x.strokeStyle=col('--oc');x.lineWidth=2.6;x.stroke();
+}
 /* ---------- Tab Spektrum ---------- */
 (()=>{const sel=h('select',{class:'btn sm','aria-label':'Salin EQ dari output'},[0,1,2,3].map(i=>h('option',{value:i,text:'Output '+(i+1)})));
   const b=h('button',{class:'btn sm',type:'button',text:'Salin ke output ini',onclick:()=>{
@@ -738,47 +785,6 @@ function drawSpec(){
 })();
 
 
-/* ---------- Spektrum di tab EQ ---------- */
-(()=>{$('#eqSpecOn').append(toggle(()=>eqSpecOn,v=>{eqSpecOn=!!v;try{localStorage.setItem('ltronik-eqspec',v?'1':'0');}catch(e){}},['Mati','Aktif']));
-  $('#eqSpecSrc').append(seg(SPSRC,()=>S.specSrc,i=>{S.specSrc=i;send('spec.src',i);}));})();
-
-/* ---------- DYN: Compressor & Gate ---------- */
-function compOut(L,T,R,W){const o=L-T;if(W<=.01)return o<=0?L:T+o/R;if(2*o<-W)return L;if(2*o>W)return T+o/R;const t=o+W/2;return L+(1/R-1)*t*t/(2*W);}
-function dynOut(d,L){let g=L;if(d.gOn&&L<d.gThr)g+=d.gRng;return d.cOn?compOut(g,d.cThr,d.cRat,d.cKnee)+d.cMk:g;}
-(()=>{
-  $('#dynSel').append(chSel());
-  const D=()=>C().d, sk=(k,v)=>{D()[k]=v;send(OUTK(cur,k),v);};
-  const sl=(label,min,max,step,k,fmt)=>slider({label,min,max,step,get:()=>D()[k],fmt,onSet:v=>sk(k,v)});
-  const ms=v=>v+' ms', db1=v=>v.toFixed(1)+' dB', db0=v=>v.toFixed(0)+' dB';
-  $('#compBox').append(chHead('Compressor',toggle(()=>D().cOn,v=>sk('cOn',v?1:0),['OFF','ON'],'onb')),
-    sl('Threshold',-60,0,.5,'cThr',db1), sl('Ratio',1,20,.5,'cRat',v=>v.toFixed(1)+' : 1'),
-    sl('Attack',1,300,1,'cAtk',ms), sl('Release',10,2000,10,'cRel',ms),
-    sl('Knee',0,12,1,'cKnee',db0), sl('Makeup',0,24,.5,'cMk',v=>'+'+v.toFixed(1)+' dB'));
-  $('#gateBox').append(chHead('Gate',toggle(()=>D().gOn,v=>sk('gOn',v?1:0),['OFF','ON'],'onb')),
-    sl('Threshold',-80,0,.5,'gThr',db1), sl('Range',-80,0,1,'gRng',db0),
-    sl('Hold',0,1000,5,'gHold',ms), sl('Release',5,2000,5,'gRel',ms));
-})();
-function drawDyn(){
-  if(tab!=='dyn')return;const cv=$('#dynCurve');if(!cv)return;const f=fitCanvas(cv);if(!f)return;const {x,w,h:H}=f;
-  const d=C().d;x.clearRect(0,0,w,H);
-  const s=Math.min(H-34,w-52),x0=42,y0=8,X=v=>x0+s*(v+60)/60,Y=o=>y0+s*(1-(o+60)/60);
-  x.font='10px system-ui';x.lineWidth=1;x.strokeStyle=col('--line2');x.fillStyle=col('--dim');
-  x.textAlign='right';
-  for(let v=-60;v<=0;v+=10){x.globalAlpha=.5;x.beginPath();x.moveTo(X(v),y0);x.lineTo(X(v),y0+s);x.stroke();x.beginPath();x.moveTo(x0,Y(v));x.lineTo(x0+s,Y(v));x.stroke();x.globalAlpha=1;x.fillText(v,x0-5,Y(v)+3);}
-  x.textAlign='center';for(let v=-60;v<=0;v+=20)x.fillText(v,X(v),y0+s+13);x.fillText('masuk (dB)',x0+s/2,y0+s+26);
-  x.save();x.translate(10,y0+s/2);x.rotate(-Math.PI/2);x.fillText('keluar (dB)',0,0);x.restore();
-  x.setLineDash([4,4]);x.strokeStyle=col('--dim');x.globalAlpha=.6;x.beginPath();x.moveTo(X(-60),Y(-60));x.lineTo(X(0),Y(0));x.stroke();x.setLineDash([]);x.globalAlpha=1;
-  if(d.cOn){x.strokeStyle=col('--warn');x.beginPath();x.moveTo(X(d.cThr),y0);x.lineTo(X(d.cThr),y0+s);x.stroke();}
-  if(d.gOn){x.strokeStyle=col('--bad');x.beginPath();x.moveTo(X(d.gThr),y0);x.lineTo(X(d.gThr),y0+s);x.stroke();}
-  x.beginPath();for(let i=0;i<=120;i++){const v=-60+i*.5,y=Y(clamp(dynOut(d,v),-60,0));i?x.lineTo(X(v),y):x.moveTo(X(v),y);}
-  x.strokeStyle=col('--oc');x.lineWidth=2.6;x.stroke();x.lineWidth=1;
-  const li=Math.max(mLast[4]*S.inL,mLast[5]*S.inR)/99*48-48;
-  if((d.cOn||d.gOn)&&li>-60){x.fillStyle=col('--text');x.beginPath();x.arc(X(li),Y(clamp(dynOut(d,li),-60,0)),4.5,0,7);x.fill();}
-  const gr=liveDyn.gr[cur],gt=liveDyn.gt[cur];
-  $('#grBar').style.width=(d.cOn?clamp(-gr/20,0,1)*100:0)+'%';$('#grTxt').textContent=d.cOn?gr.toFixed(0)+' dB':'OFF';
-  $('#gtBar').style.width=(d.gOn?gt*100:0)+'%';$('#gtBar').style.background=gt>.5?col('--ok'):col('--bad');$('#gtTxt').textContent=d.gOn?(gt>.5?'OPEN':'SHUT'):'OFF';
-}
-
 /* ---------- SETUP ---------- */
 (()=>{const box=$('#sysBox');
   box.append(h('div',{class:'card'},chHead('Nada uji 1 kHz'),
@@ -798,11 +804,85 @@ function drawDyn(){
     h('a',{class:'hb apk',href:APK_URL,download:'ltronik-dsp.apk',style:'display:inline-flex'},'UNDUH APK')));
 })();
 
+/* ---------- UPDATE firmware lewat Bluetooth (OTA) ---------- */
+const OTAC='6e400004-b5a3-f393-e0a9-e50e24dcca9e', OTA_CHUNK=200;
+const OTA={busy:false,buf:null,crc:0,wait:null,err:0,cancel:false};
+const OTA_MSG={0x81:'Sandi salah',0x82:'Gagal memulai. Cek Partition Scheme (harus ada slot OTA) dan ukuran file',0x83:'Gagal menulis ke flash',0x84:'CRC tidak cocok. Ulangi pengiriman',0x85:'Gagal memasang. File bukan firmware yang valid',0x86:'Waktu habis atau koneksi putus',0x87:'Urutan paket salah'};
+const CRCT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}return t;})();
+function crc32(b){let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CRCT[(c^b[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0;}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function onOta(code){if(OTA.wait)OTA.wait(code);else if(code>=0x80&&OTA.busy)OTA.err=code;}
+function otaWait(ok,ms){if(T.mode==='demo')return Promise.resolve(ok);
+  return new Promise((res,rej)=>{const t=setTimeout(()=>{OTA.wait=null;rej(new Error(OTA_MSG[0x86]));},ms);
+    OTA.wait=code=>{if(code===ok||code>=0x80){clearTimeout(t);OTA.wait=null;code===ok?res(code):rej(new Error(OTA_MSG[code]||('Kode '+code)));}};});}
+async function otaWrite(b){if(T.mode==='demo'){await sleep(1);return;}
+  if(T.ota.writeValueWithResponse)await T.ota.writeValueWithResponse(b);else await T.ota.writeValue(b);}
+async function otaRun(pw,ui){
+  if(OTA.busy)return;OTA.busy=true;OTA.err=0;OTA.cancel=false;ui.busy(true);
+  const data=OTA.buf,size=data.length;let sent=false;
+  try{
+    ui.status('Memulai…',0);
+    const pwb=new TextEncoder().encode(pw),hd=new Uint8Array(9+pwb.length),dv=new DataView(hd.buffer);
+    hd[0]=66;dv.setUint32(1,size,true);dv.setUint32(5,OTA.crc,true);hd.set(pwb,9);
+    let w=otaWait(1,8000);await otaWrite(hd);await w;sent=true;
+    let lastP=-1;
+    for(let off=0;off<size;off+=OTA_CHUNK){
+      if(OTA.cancel)throw new Error('Dibatalkan');
+      if(OTA.err)throw new Error(OTA_MSG[OTA.err]||'Gagal');
+      if(!T.connected)throw new Error(OTA_MSG[0x86]);
+      const n=Math.min(OTA_CHUNK,size-off),pk=new Uint8Array(n+1);pk[0]=68;pk.set(data.subarray(off,off+n),1);
+      await otaWrite(pk);
+      const p=Math.round((off+n)/size*100);if(p!==lastP){lastP=p;ui.status('Mengirim firmware…',p);}
+    }
+    ui.status('Memverifikasi dan memasang…',100);
+    w=otaWait(2,40000);await otaWrite(Uint8Array.of(69));await w;
+    ui.done();
+  }catch(e){
+    if(sent&&T.ota&&T.mode!=='demo'&&T.connected){try{await otaWrite(Uint8Array.of(88));}catch(_){}}
+    ui.fail((e&&e.message)||String(e));
+  }
+  OTA.wait=null;OTA.busy=false;ui.busy(false);
+}
+(()=>{const box=$('#sysBox');
+  const inp=h('input',{type:'file',accept:'.bin',hidden:true}),pick=h('label',{class:'ghost'},'Pilih file .bin',inp);
+  const info=h('p',{class:'note',text:'Belum ada file dipilih.'});
+  const pw=h('input',{class:'fld',type:'password',value:'ltronik','aria-label':'Sandi update',autocomplete:'off'});
+  const fill=h('i'),bar=h('div',{class:'grt'},fill),stat=h('p',{class:'note',text:''});
+  const go=h('button',{class:'ghost pri',type:'button',text:'Mulai update'}),cancel=h('button',{class:'ghost danger',type:'button',text:'Batal',hidden:true,onclick:()=>{OTA.cancel=true;}});
+  const ui={
+    status(t,p){stat.textContent=t+(p!=null?' '+p+'%':'');fill.style.width=(p||0)+'%';bar.className='grt';},
+    done(){fill.style.width='100%';bar.className='grt ok';stat.textContent='Selesai. DSP restart, tunggu tersambung kembali…';toast('Update selesai, DSP restart');},
+    fail(m){bar.className='grt err';stat.textContent='Gagal: '+m;toast('Update gagal');},
+    busy(b){go.disabled=b;cancel.hidden=!b;pick.style.pointerEvents=b?'none':'';}};
+  inp.addEventListener('change',async()=>{
+    const f=inp.files[0];OTA.buf=null;if(!f)return;
+    const b=new Uint8Array(await f.arrayBuffer());
+    if(b.length<65536||b[0]!==0xE9){info.textContent='File ditolak: bukan firmware ESP32. Pakai file berakhiran .ino.bin dari Export Compiled Binary.';return;}
+    OTA.buf=b;OTA.crc=crc32(b);info.textContent=f.name+' · '+(b.length/1024).toFixed(0)+' KB · CRC32 '+OTA.crc.toString(16).toUpperCase().padStart(8,'0');
+    bar.className='grt';fill.style.width='0%';stat.textContent='';});
+  let armed=0,tm;
+  go.onclick=()=>{
+    if(!T.connected){toast('Hubungkan ke DSP dulu');return;}
+    if(NATIVE){toast('Update lewat Bluetooth tersedia di Chrome atau Edge');return;}
+    if(T.mode!=='demo'&&!T.ota){toast('Firmware di DSP belum mendukung update lewat Bluetooth');return;}
+    if(!OTA.buf){toast('Pilih file .bin dulu');return;}
+    if(!armed){armed=1;go.textContent='Yakin? Audio dibisukan saat update';tm=setTimeout(()=>{armed=0;go.textContent='Mulai update';},3500);return;}
+    clearTimeout(tm);armed=0;go.textContent='Mulai update';otaRun(pw.value,ui);};
+  box.insertBefore(h('div',{class:'card upd'},chHead('Update firmware'),
+    h('ol',{},h('li',{text:'Di Arduino IDE pilih Sketch, lalu Export Compiled Binary.'}),
+      h('li',{text:'Ambil file berakhiran .ino.bin (bukan bootloader, partitions, atau merged).'}),
+      h('li',{text:'Hubungkan ke DSP lewat Chrome atau Edge, pilih file, lalu Mulai update.'})),
+    h('div',{class:'line',style:'margin-top:0'},pick,h('div',{class:'btns'},h('label',{text:'Sandi',style:'color:var(--dim);font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase'}),pw)),
+    info,h('div',{class:'btnrow',style:'margin:10px 0'},go,cancel),bar,stat,
+    h('p',{class:'note',text:'Jangan tutup halaman atau matikan DSP selama update. Perlu Partition Scheme yang punya slot OTA, dan layar HP dijaga tetap menyala. Pemasangan pertama kali tetap lewat kabel USB.'})),
+    (!NATIVE&&box.lastElementChild)?box.lastElementChild:null);
+})();
+
 /* ====================== Tab & start ====================== */
-function show(t){tab=t;saveUi();
+function show(t){tab=t;saveUi();if(T.connected)sendNow('spec.eq',t==='eq'?cur+1:0);
   document.querySelectorAll('section.tab').forEach(s=>s.classList.toggle('on',s.id==='t-'+t));
   document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));
-  $('main').scrollTop=0;refreshAll();if(t==='spec')drawSpec();if(t==='dyn'||t==='eq')enqueue('pD'+cur,'D'+cur);}
+  $('main').scrollTop=0;refreshAll();if(t==='spec')drawSpec();}
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>show(b.dataset.t));
 addEventListener('resize',()=>{drawEq();if(tab==='spec')drawSpec();});
 function warnMsg(m){const w=$('#warn');w.style.display='block';w.textContent=m;}
@@ -828,8 +908,8 @@ const Demo={tm:null,st:null,ver:1,t:0,
     else if(c==='G'){const v=l.length>1?parseInt(l.slice(1),10):-1;if(v===this.ver)this.emit('n');else this.emit(this.stateLine());}
     else if(c==='M'){this.t+=.17;const m=[];for(let i=0;i<6;i++)m.push(String(Math.round(clamp(52+30*Math.sin(this.t*(1.3+i*.4)+i)+Math.random()*10,0,99))).padStart(2,'0'));this.emit('m'+m.join(''));}
     else if(c==='P'){this.t+=.1;let a='',b='';for(let i=0;i<16;i++){const v=clamp(70-i*2.2+22*Math.sin(this.t*2+i*.7)+Math.random()*8,0,99);a+=String(Math.round(v)).padStart(2,'0');b+=String(Math.round(clamp(v+8,0,99))).padStart(2,'0');}this.emit('s'+a+b);}
-    else if(c==='D'){const o=parseInt(l.slice(1),10),d=this.st.ch[o].d;this.emit(`d${o}|${[d.cOn,d.cThr,d.cRat,d.cAtk,d.cRel,d.cKnee,d.cMk].join(',')}|${[d.gOn,d.gThr,d.gRng,d.gHold,d.gRel].join(',')}`);}
-    else if(c==='Y'){this.t+=.1;let r='y';this.st.ch.forEach((ch,i)=>{r+=String(Math.round(ch.d.cOn?clamp(6+5*Math.sin(this.t*2+i),0,99):0)).padStart(2,'0')+String(ch.d.gOn&&Math.sin(this.t*.8)<-.6?0:99).padStart(2,'0');});this.emit(r);}
+    else if(c==='D'){const o=parseInt(l.slice(1),10),ch=this.st.ch[o];this.emit(`d${o}|${DYNK.map(k=>ch[k]).join(',')}`);}
+    else if(c==='R'){this.t+=.15;let a='',g='';for(let i=0;i<4;i++){const q=this.st.ch[i];a+=String(q.cthr<0?clamp(Math.round(6+5*Math.sin(this.t*2+i)),0,24):0).padStart(2,'0');g+=(q.gthr>-80&&Math.sin(this.t*1.3+i)<-.3)?'0':'1';}this.emit('r'+a+g);}
     else if(c==='E'){const o=parseInt(l.slice(1),10),ch=this.st.ch[o];this.emit(`e${o}|${ch.eqf.join(',')}|${ch.eqq.map(q=>q.toFixed(1)).join(',')}`);}
   },
   stateLine(){const s=this.st;let r=`t${this.ver}|${[s.inL,s.inR,s.chosen,s.specSrc,s.peak,s.tone,s.pink,s.ig[0].toFixed(1),s.ig[1].toFixed(1),s.il[0].toFixed(1),s.il[1].toFixed(1)].join(',')}`;
@@ -848,8 +928,8 @@ const Demo={tm:null,st:null,ver:1,t:0,
       else if(f==='hpfs')c.hps=near(c.hpft,n);else if(f==='lpfs')c.lps=near(c.lpft,n);
       else if(f==='gain')c.gain=n;else if(f==='delay')c.dly=n;else if(f==='lim')c.lim=n;
       else if(f==='phase')c.phase=n===180?180:0;else if(f==='mute')c.mute=+(v==='1');
-      else if(/^eqf\d$/.test(f))c.eqf[+f[3]]=n;else if(/^eqq\d$/.test(f))c.eqq[+f[3]]=n;else if(/^eq\d$/.test(f))c.eq[+f[2]]=n;
-      else if(c.d&&f in c.d)c.d[f]=n;}
+      else if(f==='cratio')c.cr=n;else if(f in DYN_DEF)c[f]=n;
+      else if(/^eqf\d$/.test(f))c.eqf[+f[3]]=n;else if(/^eqq\d$/.test(f))c.eqq[+f[3]]=n;else if(/^eq\d$/.test(f))c.eq[+f[2]]=n;}
   }};
 </script>
 </body>
