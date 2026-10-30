@@ -257,6 +257,8 @@ nav button[aria-selected=true]{color:var(--gold);border-color:#8c7420;background
 const NATIVE=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
 /* Alamat file APK. Ganti dengan tautan Anda, mis. https://github.com/NAMA/REPO/releases/latest/download/ltronik-dsp.apk */
 const APK_URL='ltronik-dsp.apk';
+/* Alamat halaman web ini (https) untuk tombol "Buka di Chrome" di aplikasi APK. Kosongkan bila belum ada. */
+const WEB_URL='https://arga0705.github.io/DLMS-APK-1.0/';
 /* ====================== Konstanta protokol (sesuai firmware v1.9.4) ====================== */
 const SVC='6e400001-b5a3-f393-e0a9-e50e24dcca9e', RXC='6e400002-b5a3-f393-e0a9-e50e24dcca9e', TXC='6e400003-b5a3-f393-e0a9-e50e24dcca9e';
 const SPF=[25,40,63,100,160,250,400,630,1000,1600,2500,4000,6300,10000,16000,20000];
@@ -844,6 +846,12 @@ async function otaRun(pw,ui){
   OTA.wait=null;OTA.busy=false;ui.busy(false);
 }
 (()=>{const box=$('#sysBox');
+  if(NATIVE){   // aplikasi APK: update firmware hanya lewat Chrome
+    box.append(h('div',{class:'card upd'},chHead('Update firmware'),
+      h('p',{class:'note',style:'margin:0 0 12px',text:'Update firmware tidak bisa lewat aplikasi APK. Buka halaman web ini di Chrome (Android atau Windows), tekan CONNECT, lalu buka menu Setup untuk memperbarui.'}),
+      WEB_URL?h('a',{class:'hb conn',href:WEB_URL,target:'_blank',rel:'noopener',style:'display:inline-flex'},'BUKA DI CHROME'):null));
+    return;
+  }
   const inp=h('input',{type:'file',accept:'.bin',hidden:true}),pick=h('label',{class:'ghost'},'Pilih file .bin',inp);
   const info=h('p',{class:'note',text:'Belum ada file dipilih.'});
   const pw=h('input',{class:'fld',type:'password',value:'ltronik','aria-label':'Sandi update',autocomplete:'off'});
