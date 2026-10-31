@@ -2,9 +2,14 @@ name: Build APK
 
 # Syarat di repo:
 #   - package.json (Vite + Capacitor 7 + @capacitor-community/bluetooth-le), webDir = dist
+#   - index.html di root repo (memuat /src/native.js)
+#   - src/native.js          (jembatan BLE: harus punya writeChar/notifyChar untuk update firmware)
 #   - src/bleOta.js          (modul update firmware, dari saya)
 #   - dlms-ltronik.png       (opsional: ikon aplikasi)
-# Update firmware ada di menu System (index.html) dan memakai src/native.js -> src/bleOta.js.
+# Update firmware ada di menu Setup/System (index.html): UI mengirim paket OTA lewat NativeBle.writeChar/notifyChar
+# di src/native.js, memakai koneksi BLE yang sudah terhubung (tanpa Chrome).
+# Opsional (secret): DEBUG_KEYSTORE_B64 = base64 dari debug.keystore tetap, supaya APK hasil build baru bisa
+#   dipasang menimpa versi lama tanpa uninstall (tanpa ini tanda tangan debug berubah tiap build).
 # Tidak ada lagi tombol melayang yang disisipkan saat build.
 
 on:
@@ -40,6 +45,12 @@ jobs:
       - name: Cek file bleOta
         run: |
           test -f "$BLEOTA_PATH" || { echo "ERROR: $BLEOTA_PATH tidak ditemukan. Salin bleOta.js ke folder src/"; exit 1; }
+
+      - name: Cek jembatan native (update firmware)
+        run: |
+          test -f src/native.js || { echo "ERROR: src/native.js tidak ditemukan"; exit 1; }
+          grep -q "writeChar" src/native.js && grep -q "notifyChar" src/native.js || { echo "ERROR: src/native.js belum punya writeChar/notifyChar (update firmware lewat APK tidak akan jalan). Pakai native.js terbaru."; exit 1; }
+          grep -q "/src/native.js" index.html || { echo "ERROR: index.html tidak memuat /src/native.js"; exit 1; }
 
       - name: Install dependencies
         run: |
@@ -139,6 +150,18 @@ jobs:
                       path.unlink()
           print("Ikon berhasil dipasang.")
           PY
+
+      - name: Pakai keystore debug tetap (opsional)
+        env:
+          DEBUG_KEYSTORE_B64: ${{ secrets.DEBUG_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$DEBUG_KEYSTORE_B64" ]; then
+            mkdir -p ~/.android
+            echo "$DEBUG_KEYSTORE_B64" | base64 -d > ~/.android/debug.keystore
+            echo "Keystore debug tetap dipakai."
+          else
+            echo "Secret DEBUG_KEYSTORE_B64 tidak ada: tanda tangan debug baru tiap build (uninstall dulu sebelum memasang)."
+          fi
 
       - name: Build APK
         run: |
