@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b0636">
+<meta name="theme-color" content="#000000">
 <title>L-TRONIK DSP PRO</title>
 <style>
 :root{
-  --bg:#060420; --c1:#150c4c; --c2:#0d0737; --line:#3a2fb0; --line2:#2a2490; --deep:#07031f; --track:#2b2370; --off:#17124d;
-  --text:#eef0ff; --dim:#9aa0d8; --gold:#ffc01f; --pur:#6c4cff; --ok:#35e07f; --warn:#ffc01f; --bad:#ff4d6d;
+  --bg:#000000; --c1:#121212; --c2:#080808; --line:#3d3d3d; --line2:#2b2b2b; --deep:#000000; --track:#303030; --off:#1d1d1d;
+  --text:#f2f2f2; --dim:#9b9b9b; --gold:#ffc01f; --pur:#6c4cff; --ok:#35e07f; --warn:#ffc01f; --bad:#ff4d6d;
   --oc:#22d3ee;
   --mono:ui-monospace,"Cascadia Code","SF Mono",Consolas,"Roboto Mono",monospace;
   color-scheme:dark;
@@ -21,17 +21,17 @@ h1,h2,h3{margin:0}
 .ic{display:inline-flex;vertical-align:middle}.ic svg{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
 /* ---------- header ---------- */
-header{flex:none;background:linear-gradient(180deg,#171063,#0d0740);border-bottom:2px solid #3b2cc8;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px}
+header{flex:none;background:linear-gradient(180deg,#161616,#000000);border-bottom:2px solid #333333;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px}
 .hd{max-width:880px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .logo{width:46px;height:46px;flex:none;filter:drop-shadow(0 0 8px #22d3ee88)}
 .ttl{min-width:0}
 .t1{display:flex;align-items:center;gap:10px}
 .t1 h1{font-size:25px;font-weight:900;color:var(--gold);letter-spacing:.02em;line-height:1}
-.badge{font-size:10px;font-weight:800;letter-spacing:.08em;color:#c9bbff;border:1px solid #6c4cff;background:#2a1a8a;border-radius:6px;padding:2px 8px}
+.badge{font-size:10px;font-weight:800;letter-spacing:.08em;color:#dcdcdc;border:1px solid #5a5a5a;background:#1c1c1c;border-radius:6px;padding:2px 8px}
 .t2{font-size:12px;font-weight:800;margin-top:3px;letter-spacing:.02em}
 .t3{font-size:10px;color:var(--dim);margin-top:2px;letter-spacing:.04em}
 .acts{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid #a47a1a;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:800;color:var(--gold);letter-spacing:.04em;background:#1a0f4a;text-transform:uppercase;max-width:200px}
+.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid #a47a1a;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:800;color:var(--gold);letter-spacing:.04em;background:#111111;text-transform:uppercase;max-width:200px}
 .pill b{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--bad);box-shadow:0 0 8px var(--bad);flex:none}
 .pill.on{border-color:#1f9d57;color:var(--ok)}.pill.on .dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
@@ -40,18 +40,18 @@ header{flex:none;background:linear-gradient(180deg,#171063,#0d0740);border-botto
 .hb[hidden]{display:none}
 .hb.apk{background:linear-gradient(180deg,#14b87a,#0c8f60);border-color:#35e0a0;color:#fff}
 .hb.conn{background:linear-gradient(180deg,#5a3df0,#3a22b8);border-color:#d9d2ff;color:#fff;box-shadow:0 0 12px #6c4cff66}
-.hb.demo{background:#1a1160;border-color:#6c4cff;color:#d8d0ff}
+.hb.demo{background:#141414;border-color:#5a5a5a;color:#e0e0e0}
 .hb:active{filter:brightness(1.2)}
 #warn{display:none;max-width:880px;margin:10px auto 0;padding:9px 12px;border:1px solid var(--warn);border-radius:10px;color:var(--warn);font-size:12.5px;background:#2a1d06}
 #warnWrap{flex:none;padding:0 14px}
 @media (max-width:640px){.t3{display:none}.acts{width:100%;margin-left:0;justify-content:space-between}.hb{padding:8px 10px}.pill{padding:6px 9px}}
 
 /* ---------- layout ---------- */
-main{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 14px 20px;-webkit-overflow-scrolling:touch;background:radial-gradient(1200px 500px at 50% -100px,#12094a55,transparent)}
+main{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 14px 20px;-webkit-overflow-scrolling:touch;background:radial-gradient(1200px 500px at 50% -100px,#ffffff0b,transparent)}
 .wrap{max-width:880px;margin:0 auto}
 section.tab{display:none}section.tab.on{display:block}
 section#t-eq,section#t-xover,section#t-dyn{--c:var(--oc)}
-.card{background:linear-gradient(160deg,var(--c1),var(--c2));border:1.5px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 0 22px #1a0f6a44}
+.card{background:linear-gradient(160deg,var(--c1),var(--c2));border:1.5px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 0 22px #ffffff08}
 .card.gold{border-color:#8c7420;box-shadow:0 0 22px #ffc01f14}
 .chead{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
 .chead .bar{width:8px;height:24px;border-radius:4px;background:var(--c,var(--gold));box-shadow:0 0 10px var(--c,var(--gold));flex:none}
@@ -64,7 +64,7 @@ section#t-eq,section#t-xover,section#t-dyn{--c:var(--oc)}
 .grid2{display:grid;grid-template-columns:1fr;gap:14px}
 @media (min-width:700px){.grid2{grid-template-columns:1fr 1fr}.grid2.in{gap:14px}}
 .grid2 .card{margin-bottom:0}
-.sub{background:#0a0538aa;border:1px solid var(--line2);border-radius:12px;padding:12px 14px}
+.sub{background:#0a0a0a;border:1px solid var(--line2);border-radius:12px;padding:12px 14px}
 .cardin{margin-top:12px}
 .srow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
 .sname{display:flex;align-items:center;gap:9px;font-weight:900;letter-spacing:.03em;color:var(--c);text-transform:uppercase}
@@ -73,8 +73,8 @@ section#t-eq,section#t-xover,section#t-dyn{--c:var(--oc)}
 .sfoot b{color:var(--text);font-family:var(--mono);font-weight:700}
 .detail{display:none;margin-top:6px}.card.open .detail{display:block}
 .note{color:var(--dim);font-size:12px;margin:6px 2px 0}
-.ghost{display:inline-flex;align-items:center;gap:6px;border:1px solid #6c4cff;background:#1a1160;color:#d8d0ff;border-radius:9px;padding:6px 11px;font-size:11px;font-weight:800;letter-spacing:.04em;cursor:pointer;min-height:32px;text-transform:uppercase}
-.ghost.red{border-color:#ff4d6d;color:#ff7d93;background:#2a0f3a}
+.ghost{display:inline-flex;align-items:center;gap:6px;border:1px solid #5a5a5a;background:#141414;color:#e0e0e0;border-radius:9px;padding:6px 11px;font-size:11px;font-weight:800;letter-spacing:.04em;cursor:pointer;min-height:32px;text-transform:uppercase}
+.ghost.red{border-color:#ff4d6d;color:#ff7d93;background:#2b0510}
 .ghost.danger{border-color:#ff4d6d;color:#ff7d93}
 .ghost:active{filter:brightness(1.3)}
 .ghost.pri{background:linear-gradient(180deg,#5a3df0,#3a22b8);color:#fff;border-color:#d9d2ff}
@@ -86,7 +86,7 @@ section#t-eq,section#t-xover,section#t-dyn{--c:var(--oc)}
 .ml{font-size:11.5px;font-weight:800;color:var(--dim);letter-spacing:.06em}
 .mdb{font-size:11px;color:var(--dim);font-family:var(--mono)}.mdb b{font-size:12.5px;color:var(--text);font-weight:800}
 .mdb.clip b{color:var(--bad)}
-.meter{display:grid;grid-template-columns:repeat(16,1fr);gap:3px;background:var(--deep);border:1px solid #1b1763;border-radius:8px;padding:5px}
+.meter{display:grid;grid-template-columns:repeat(16,1fr);gap:3px;background:var(--deep);border:1px solid #2b2b2b;border-radius:8px;padding:5px}
 .meter i{height:14px;border-radius:2px;background:var(--off)}
 .meter i.on{background:var(--ok);box-shadow:0 0 6px #35e07f66}
 .meter i.on.w{background:var(--warn);box-shadow:0 0 6px #ffc01f66}
@@ -119,7 +119,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .tg.chip[aria-pressed=true]{background:#3a22b8;border-color:#8a74ff;color:#fff}
 .srcb{margin-left:auto;border:0;border-radius:7px;background:var(--gold);color:#2b1d00;font-weight:900;font-size:12px;padding:5px 12px;cursor:pointer;letter-spacing:.04em}
 hr{border:0;border-top:1px solid var(--line2);margin:14px 0}
-select.ghost{padding-right:6px}select.ghost option{background:#150c4c}
+select.ghost{padding-right:6px}select.ghost option{background:#141414}
 
 /* ---------- matrix ---------- */
 .matrix{display:grid;grid-template-columns:64px repeat(3,1fr) 64px 70px;gap:8px;align-items:center}
@@ -128,13 +128,13 @@ select.ghost{padding-right:6px}select.ghost option{background:#150c4c}
 .matrix .mo{white-space:nowrap;font-size:12px}
 .matrix .mo i{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
 .mx{border:1px solid var(--line2);background:var(--deep);border-radius:10px;height:42px;cursor:pointer;color:var(--dim);font-weight:900}
-.mx[aria-pressed=true]{background:var(--c);border-color:var(--c);color:#06041a;box-shadow:0 0 14px var(--c)}
+.mx[aria-pressed=true]{background:var(--c);border-color:var(--c);color:#000000;box-shadow:0 0 14px var(--c)}
 .matrix .tg{width:100%;padding-left:2px;padding-right:2px;min-height:42px}
 @media (max-width:480px){.matrix{grid-template-columns:58px repeat(3,1fr) 48px 52px;gap:5px}.matrix .mo{font-size:11px;gap:5px}.matrix .tg{font-size:10px}}
 
 /* ---------- EQ / kurva ---------- */
 canvas{display:block;width:100%}
-#eqCurve,#xoCurve,#dynCurve{background:var(--deep);border:1px solid #1b1763;border-radius:10px}
+#eqCurve,#xoCurve,#dynCurve{background:var(--deep);border:1px solid #2b2b2b;border-radius:10px}
 #eqCurve{height:160px;margin-bottom:10px}#xoCurve{height:170px}#dynCurve{height:200px}
 .legend{display:flex;gap:14px;font-size:12px;color:var(--dim);margin-top:10px;flex-wrap:wrap;font-weight:700}
 .legend i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
@@ -151,14 +151,14 @@ canvas{display:block;width:100%}
 .fcol.sel .f{color:var(--c)}
 .btnrow{display:flex;gap:8px;flex-wrap:wrap}
 
-#spec{height:240px;background:var(--deep);border:1px solid #1b1763;border-radius:10px}
+#spec{height:240px;background:var(--deep);border:1px solid #2b2b2b;border-radius:10px}
 .preset{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line2)}
 .preset:first-of-type{border-top:0}
 .preset .nm{flex:1;font-weight:800}
 .preset .cur{color:var(--gold);font-size:11px;margin-left:8px;font-weight:700}
 .btns{display:flex;gap:8px;align-items:center}
 
-nav{flex:none;display:grid;grid-template-columns:repeat(9,1fr);gap:2px;background:linear-gradient(180deg,#0d0740,#090430);border-top:2px solid #2d22a0;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+nav{flex:none;display:grid;grid-template-columns:repeat(9,1fr);gap:2px;background:linear-gradient(180deg,#0e0e0e,#000000);border-top:2px solid #2b2b2b;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
 nav button{border:1px solid transparent;background:none;border-radius:12px;padding:7px 0 6px;color:var(--dim);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;font-weight:800;letter-spacing:.03em;min-width:0}
 nav button .ic{font-size:21px}
 nav button[aria-selected=true]{color:var(--gold);border-color:#8c7420;background:#2a1d0a55;box-shadow:0 0 12px #ffc01f18}
@@ -166,7 +166,7 @@ nav button[aria-selected=true]{color:var(--gold);border-color:#8c7420;background
 #toast.on{opacity:1}
 @media (max-width:380px){.fcol .f{font-size:9.5px}.t1 h1{font-size:21px}nav button{font-size:8.5px}}
 .grw{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
-.grt{flex:1;min-width:120px;height:14px;background:var(--deep);border:1px solid #1b1763;border-radius:8px;overflow:hidden}
+.grt{flex:1;min-width:120px;height:14px;background:var(--deep);border:1px solid #2b2b2b;border-radius:8px;overflow:hidden}
 .grt i{display:block;height:100%;width:0;background:var(--warn);box-shadow:0 0 6px #ffc01f66;transition:width .12s}
 .grw b{font-family:var(--mono);font-size:12.5px;min-width:56px;text-align:right}
 .lamp{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line2);border-radius:20px;padding:4px 11px;font-size:11px;font-weight:800;letter-spacing:.05em;color:var(--dim)}
@@ -186,7 +186,7 @@ nav button[aria-selected=true]{color:var(--gold);border-color:#8c7420;background
 <body>
 
 <header><div class="hd">
-  <svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><rect x="2" y="2" width="44" height="44" rx="11" fill="#0a0640" stroke="#22d3ee" stroke-width="2"/><path d="M15 11v22h17" fill="none" stroke="#22d3ee" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 28c2-10 4-10 6 0s4 10 6 0" fill="none" stroke="#ffc01f" stroke-width="2.6" stroke-linecap="round"/></svg>
+  <svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><rect x="2" y="2" width="44" height="44" rx="11" fill="#000000" stroke="#22d3ee" stroke-width="2"/><path d="M15 11v22h17" fill="none" stroke="#22d3ee" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 28c2-10 4-10 6 0s4 10 6 0" fill="none" stroke="#ffc01f" stroke-width="2.6" stroke-linecap="round"/></svg>
   <div class="ttl">
     <div class="t1"><h1>DSP PRO</h1><span class="badge">ANDROID</span></div>
     <div class="t2">L-TRONIK AUDIO PROCESSOR</div>
@@ -295,7 +295,7 @@ const mkCh=()=>({src:0,hpft:0,lpft:0,hpf:20,hps:12,lpf:20000,lps:12,gain:0,dly:0
   eq:Array(10).fill(0),eqf:[31,63,125,250,500,1000,2000,4000,8000,16000],eqq:Array(10).fill(1.4),gthr:-80,grng:60,grel:100,cthr:0,cr:4,catk:10,crel:150,cknee:6,cmk:0});
 const DYNK=['gthr','grng','grel','cthr','cr','catk','crel','cknee','cmk'];   // urutan sama dengan balasan firmware "d<out>|..."
 const dynOf=c=>{const o={};DYNK.forEach(k=>o[k]=c[k]);return o;};
-let S={ver:-1,inL:1,inR:1,chosen:0,specSrc:0,peak:1,tone:0,pink:0,ig:[0,0],il:[0.5,0.5],ch:[mkCh(),mkCh(),mkCh(),mkCh()]};
+let S={ver:-1,inL:1,inR:1,chosen:0,specSrc:0,peak:1,tone:0,pink:0,ig:[0,0],il:[0.5,0.5],ch:[mkCh(),mkCh(),mkCh(),mkCh()],idyn:[mkCh(),mkCh()]};   // idyn = gate & kompresor input L/R
 const TABS=['home','matrix','eq','xover','dyn','delay','spec','preset','setup'];
 let cur=0, selBand=0, tab='home', wl=null;
 const LS='ltronik-ui';
@@ -410,7 +410,7 @@ function handleLine(l){
 function parseState(l){
   const p=l.split('|'); if(p.length<6)return;
   const g=p[1].split(',').map(Number); if(g.length<11||g.some(isNaN))return;
-  const n={ver:parseInt(p[0].slice(1),10),inL:g[0],inR:g[1],chosen:g[2],specSrc:g[3],peak:g[4],tone:g[5],pink:g[6],ig:[g[7],g[8]],il:[g[9],g[10]],ch:[]};
+  const n={ver:parseInt(p[0].slice(1),10),inL:g[0],inR:g[1],chosen:g[2],specSrc:g[3],peak:g[4],tone:g[5],pink:g[6],ig:[g[7],g[8]],il:[g[9],g[10]],ch:[],idyn:S.idyn||[mkCh(),mkCh()]};
   for(let i=0;i<4;i++){const a=p[2+i].split(',').map(Number); if(a.length<22||a.some(isNaN))return;
     n.ch.push({src:a[0],hpft:a[1],lpft:a[2],hpf:a[3],hps:a[4],lpf:a[5],lps:a[6],gain:a[7],dly:a[8],lim:a[9],phase:a[10],mute:a[11],eq:a.slice(12,22),eqf:S.ch[i].eqf,eqq:S.ch[i].eqq,...dynOf(S.ch[i])});}
   if(dragging||Date.now()<holdUntil)return;           // jangan timpa saat pengguna sedang mengubah
@@ -425,15 +425,16 @@ function parseMeter(l){
   for(let i=0;i<2;i++)METER.i[i]&&METER.i[i].set(v[4+i]);
 }
 const METER={o:[],i:[]};
-let grV=[0,0,0,0], gOpen=[1,1,1,1], updateGr=()=>{};   // gain reduction (dB, positif) & status gate tiap output
+let grV=[0,0,0,0,0,0], gOpen=[1,1,1,1,1,1], updateGr=()=>{};   // gain reduction (dB, positif) & status gate: indeks 0..3 output, 4..5 input L/R
 function parseGr(l){const d=l.slice(1);if(d.length<12)return;
   for(let i=0;i<4;i++){grV[i]=clamp(parseInt(d.substr(i*2,2),10)||0,0,99);gOpen[i]=d[8+i]==='1';}
+  if(d.length>=18)for(let i=0;i<2;i++){grV[4+i]=clamp(parseInt(d.substr(12+i*2,2),10)||0,0,99);gOpen[4+i]=d[16+i]==='1';}   // firmware baru: IN L/R
   updateGr();}
 function parseDyn(l){const p=l.split('|');if(p.length<2)return;
-  const o=parseInt(p[0].slice(1),10);if(!(o>=0&&o<4))return;
+  const o=parseInt(p[0].slice(1),10);if(!(o>=0&&o<6))return;
   const a=p[1].split(',').map(Number);if(a.length<9||a.some(isNaN))return;
   if(dragging||Date.now()<holdUntil)return;
-  const c=S.ch[o];DYNK.forEach((k,i)=>c[k]=a[i]);refreshAll();}
+  const c=o<4?S.ch[o]:S.idyn[o-4];DYNK.forEach((k,i)=>c[k]=a[i]);refreshAll();}
 function resetMeters(){[...METER.o,...METER.i].forEach(m=>m&&m.reset());}
 let specV=new Array(16).fill(0), specP=new Array(16).fill(0);
 function parseSpec(l){
@@ -460,7 +461,7 @@ setInterval(()=>{
     if(tab==='spec'||tab==='eq')enqueue('pP','P');
     if(tab==='dyn')enqueue('pR','R');
     if(tick%6===0)enqueue('pG','G'+(S.ver>=0?S.ver:''));
-    if(needD&&tick%2===1){enqueue('pD'+dNext,'D'+dNext);dNext++;if(dNext>3){dNext=0;needD=false;}}
+    if(needD&&tick%2===1){enqueue('pD'+dNext,'D'+dNext);dNext++;if(dNext>5){dNext=0;needD=false;}}
     if(needE&&tick%2===0){enqueue('pE'+eqNext,'E'+eqNext);eqNext++;if(eqNext>3){eqNext=0;needE=false;}}
   }
 },170);
@@ -497,7 +498,7 @@ function toggle(get,set,labels,cls){
   reg(()=>{const on=!!get();b.setAttribute('aria-pressed',on);b.textContent=on?labels[1]:labels[0];});
   return b;
 }
-const chSel=()=>seg(['1','2','3','4'],()=>cur,i=>{cur=i;saveUi();if(tab==='eq'&&T.connected)sendNow('spec.eq',cur+1);});
+const chSel=()=>seg(['1','2','3','4'],()=>cur,i=>{cur=i;if(dcur<4)dcur=i;saveUi();if(tab==='eq'&&T.connected)sendNow('spec.eq',cur+1);});
 function dynSeg(getOpts,get,set){   // segmen yang pilihannya berubah (slope tergantung tipe)
   const el=h('div',{class:'seg'});
   reg(()=>{const o=getOpts();if(el.children.length!==o.length||el.dataset.k!==o.join()){el.textContent='';el.dataset.k=o.join();
@@ -600,6 +601,11 @@ const chHead=(title,rightEl)=>h('div',{class:'chead'},h('span',{class:'bar'}),h(
 })();
 
 /* ---------- DYN (Comp / Gate) ---------- */
+let dcur=cur;   // sumber tab Comp/Gate: 0..3 = output, 4 = IN L, 5 = IN R
+const DC=()=>dcur<4?S.ch[dcur]:S.idyn[dcur-4];
+const DKEY=()=>dcur<4?`o${dcur+1}.`:`id${dcur-4}.`;   // awalan kunci perintah ke firmware
+const DNAME=()=>dcur<4?'output '+(dcur+1):(dcur===4?'input L':'input R');
+const dynSel=()=>seg(['1','2','3','4','IN L','IN R'],()=>dcur,i=>{dcur=i;if(i<4){cur=i;saveUi();}refreshAll();});
 const RATV=[1.5,2,3,4,6,8,10,20,100], RATL=['1.5','2','3','4','6','8','10','20','∞'];
 const DYN_DEF={gthr:-80,grng:60,grel:100,cthr:0,cr:4,catk:10,crel:150,cknee:6,cmk:0};
 const DYN_KEY={gthr:'gthr',grng:'grng',grel:'grel',cthr:'cthr',cr:'cratio',catk:'catk',crel:'crel',cknee:'cknee',cmk:'cmk'};
@@ -609,31 +615,31 @@ function dynOut(c,x){let y=x;if(c.gthr>-80&&x<c.gthr)y-=c.grng;
 (()=>{const box=$('#dynBox');
   const grFill=h('i'),grTxt=h('b',{text:'0 dB'}),lamp=h('span',{class:'lamp'},h('i'),h('b',{text:'GATE OFF'}));
   const lg=h('div',{class:'legend'},h('span',{},h('i',{style:'background:#22d3ee'}),'Threshold gate'),h('span',{},h('i',{style:'background:#ffc01f'}),'Threshold kompresor'));
-  box.append(h('div',{class:'card'},chHead('Comp / Gate',chSel()),h('canvas',{id:'dynCurve'}),lg,
+  box.append(h('div',{class:'card'},chHead('Comp / Gate',dynSel()),h('canvas',{id:'dynCurve'}),lg,
     h('div',{class:'grw'},h('span',{class:'ml',text:'GR'}),h('div',{class:'grt'},grFill),grTxt,lamp),
-    h('p',{class:'note',text:'Kurva: level masuk (sumbu X) ke level keluar (sumbu Y), dalam dB. GR adalah pengurangan gain kompresor.'})));
-  updateGr=()=>{const c=C(),g=c.cthr<0?grV[cur]:0;grFill.style.width=clamp(g/24*100,0,100)+'%';grTxt.textContent=g?'-'+g+' dB':'0 dB';
-    const off=c.gthr<=-80;lamp.className='lamp '+(off?'':(gOpen[cur]?'open':'closed'));lamp.querySelector('b').textContent=off?'GATE OFF':(gOpen[cur]?'GATE BUKA':'GATE TUTUP');};
+    h('p',{class:'note',text:'Pilih sumber: output 1-4 atau input L/R (dipasang sebelum limiter input). Kurva: level masuk (sumbu X) ke level keluar (sumbu Y), dalam dB. GR adalah pengurangan gain kompresor.'})));
+  updateGr=()=>{const c=DC(),g=c.cthr<0?grV[dcur]:0;grFill.style.width=clamp(g/24*100,0,100)+'%';grTxt.textContent=g?'-'+g+' dB':'0 dB';
+    const off=c.gthr<=-80;lamp.className='lamp '+(off?'':(gOpen[dcur]?'open':'closed'));lamp.querySelector('b').textContent=off?'GATE OFF':(gOpen[dcur]?'GATE BUKA':'GATE TUTUP');};
   reg(updateGr);
-  const set=(k,v)=>{C()[k]=v;send(`o${N()}.${DYN_KEY[k]}`,v);};
+  const set=(k,v)=>{DC()[k]=v;send(DKEY()+DYN_KEY[k],v);};
   const wrap=h('div',{style:'--c:var(--oc)'});
   wrap.append(
     h('div',{class:'card'},chHead('Noise gate'),
-      slider({label:'Threshold',min:-80,max:-10,step:1,get:()=>C().gthr,fmt:v=>v<=-80?'OFF':v.toFixed(0)+' dB',onSet:v=>set('gthr',v)}),
-      slider({label:'Release',min:10,max:2000,step:10,get:()=>C().grel,fmt:v=>v.toFixed(0)+' ms',onSet:v=>set('grel',v)}),
-      slider({label:'Range (redaman)',min:6,max:80,step:1,get:()=>C().grng,fmt:v=>'-'+v.toFixed(0)+' dB',onSet:v=>set('grng',v)}),
+      slider({label:'Threshold',min:-80,max:-10,step:1,get:()=>DC().gthr,fmt:v=>v<=-80?'OFF':v.toFixed(0)+' dB',onSet:v=>set('gthr',v)}),
+      slider({label:'Release',min:10,max:2000,step:10,get:()=>DC().grel,fmt:v=>v.toFixed(0)+' ms',onSet:v=>set('grel',v)}),
+      slider({label:'Range (redaman)',min:6,max:80,step:1,get:()=>DC().grng,fmt:v=>'-'+v.toFixed(0)+' dB',onSet:v=>set('grng',v)}),
       h('p',{class:'note',text:'Threshold -80 dB berarti gate mati. Sinyal di bawah threshold diredam sebesar Range.'})),
     h('div',{class:'card'},chHead('Kompresor'),
-      slider({label:'Threshold',min:-60,max:0,step:1,get:()=>C().cthr,fmt:v=>v>=0?'OFF':v.toFixed(0)+' dB',onSet:v=>set('cthr',v)}),
-      h('div',{class:'line'},h('label',{text:'Ratio'}),seg(RATL,()=>RATV.indexOf(C().cr),i=>{C().cr=RATV[i];send(`o${N()}.cratio`,RATV[i]);})),
-      slider({label:'Attack',min:1,max:200,step:1,get:()=>C().catk,fmt:v=>v.toFixed(0)+' ms',onSet:v=>set('catk',v)}),
-      slider({label:'Release',min:10,max:2000,step:10,get:()=>C().crel,fmt:v=>v.toFixed(0)+' ms',onSet:v=>set('crel',v)}),
-      slider({label:'Knee',min:0,max:12,step:1,get:()=>C().cknee,fmt:v=>v.toFixed(0)+' dB',onSet:v=>set('cknee',v)}),
-      slider({label:'Makeup gain',min:0,max:24,step:0.5,get:()=>C().cmk,fmt:v=>'+'+v.toFixed(1)+' dB',onSet:v=>set('cmk',v)}),
+      slider({label:'Threshold',min:-60,max:0,step:1,get:()=>DC().cthr,fmt:v=>v>=0?'OFF':v.toFixed(0)+' dB',onSet:v=>set('cthr',v)}),
+      h('div',{class:'line'},h('label',{text:'Ratio'}),seg(RATL,()=>RATV.indexOf(DC().cr),i=>{DC().cr=RATV[i];send(DKEY()+'cratio',RATV[i]);})),
+      slider({label:'Attack',min:1,max:200,step:1,get:()=>DC().catk,fmt:v=>v.toFixed(0)+' ms',onSet:v=>set('catk',v)}),
+      slider({label:'Release',min:10,max:2000,step:10,get:()=>DC().crel,fmt:v=>v.toFixed(0)+' ms',onSet:v=>set('crel',v)}),
+      slider({label:'Knee',min:0,max:12,step:1,get:()=>DC().cknee,fmt:v=>v.toFixed(0)+' dB',onSet:v=>set('cknee',v)}),
+      slider({label:'Makeup gain',min:0,max:24,step:0.5,get:()=>DC().cmk,fmt:v=>'+'+v.toFixed(1)+' dB',onSet:v=>set('cmk',v)}),
       h('p',{class:'note',text:'Threshold 0 dB berarti kompresor mati. Makeup hanya bekerja saat kompresor aktif.'}),
       h('hr'),
-      h('button',{class:'ghost',type:'button',text:'Reset gate dan kompresor output '+'ini',onclick:()=>{
-        for(const k of DYNK){C()[k]=DYN_DEF[k];send(`o${N()}.${DYN_KEY[k]}`,DYN_DEF[k]);}refreshAll();toast('Gate dan kompresor output '+N()+' direset');}})));
+      h('button',{class:'ghost',type:'button',text:'Reset gate dan kompresor sumber ini',onclick:()=>{
+        for(const k of DYNK){DC()[k]=DYN_DEF[k];send(DKEY()+DYN_KEY[k],DYN_DEF[k]);}refreshAll();toast('Gate dan kompresor '+DNAME()+' direset');}})));
   box.append(wrap);
 })();
 
@@ -747,7 +753,7 @@ function drawDyn(){
     x.beginPath();x.moveTo(X(d)+.5,t);x.lineTo(X(d)+.5,t+ph);x.stroke();x.globalAlpha=1;
     x.textAlign='right';x.fillText(String(d),l-4,Y(d)+3);x.textAlign='center';x.fillText(String(d),X(d),H-6);}
   x.textAlign='left';
-  const c=C();
+  const c=DC();
   x.setLineDash([4,4]);x.strokeStyle=col('--line');x.beginPath();x.moveTo(X(-60),Y(-60));x.lineTo(X(0),Y(0));x.stroke();
   if(c.gthr>-80){x.strokeStyle='#22d3ee';x.beginPath();x.moveTo(X(c.gthr)+.5,t);x.lineTo(X(c.gthr)+.5,t+ph);x.stroke();}
   if(c.cthr<0){x.strokeStyle='#ffc01f';x.beginPath();x.moveTo(X(c.cthr)+.5,t);x.lineTo(X(c.cthr)+.5,t+ph);x.stroke();}
@@ -912,7 +918,7 @@ show(tab);
 
 /* ====================== Mode demo (meniru firmware untuk uji tampilan) ====================== */
 const Demo={tm:null,st:null,ver:1,t:0,
-  start(){this.ver=1;this.st=JSON.parse(JSON.stringify({inL:1,inR:1,chosen:0,specSrc:0,peak:1,tone:0,pink:0,ig:[0,0],il:[0.5,0.5],
+  start(){this.ver=1;this.st=JSON.parse(JSON.stringify({inL:1,inR:1,chosen:0,specSrc:0,peak:1,tone:0,pink:0,ig:[0,0],il:[0.5,0.5],idyn:[mkCh(),mkCh()],
     ch:[0,1,2,3].map(i=>{const c=mkCh();c.eqf=[31,63,125,250,500,1000,2000,4000,8000,16000];c.eqq=[1.4,1.4,1.4,1.4,1.4,1.4,1.4,1.4,1.4,1.4];
       if(i>=2){c.hpf=2000;c.lpf=20000;}else{c.hpf=40;c.lpf=i?20000:120;}c.eq[2]=i===0?3:0;c.eq[5]=-2;return c;})}));
     this.stop();},
@@ -923,19 +929,20 @@ const Demo={tm:null,st:null,ver:1,t:0,
     else if(c==='G'){const v=l.length>1?parseInt(l.slice(1),10):-1;if(v===this.ver)this.emit('n');else this.emit(this.stateLine());}
     else if(c==='M'){this.t+=.17;const m=[];for(let i=0;i<6;i++)m.push(String(Math.round(clamp(52+30*Math.sin(this.t*(1.3+i*.4)+i)+Math.random()*10,0,99))).padStart(2,'0'));this.emit('m'+m.join(''));}
     else if(c==='P'){this.t+=.1;let a='',b='';for(let i=0;i<16;i++){const v=clamp(70-i*2.2+22*Math.sin(this.t*2+i*.7)+Math.random()*8,0,99);a+=String(Math.round(v)).padStart(2,'0');b+=String(Math.round(clamp(v+8,0,99))).padStart(2,'0');}this.emit('s'+a+b);}
-    else if(c==='D'){const o=parseInt(l.slice(1),10),ch=this.st.ch[o];this.emit(`d${o}|${DYNK.map(k=>ch[k]).join(',')}`);}
-    else if(c==='R'){this.t+=.15;let a='',g='';for(let i=0;i<4;i++){const q=this.st.ch[i];a+=String(q.cthr<0?clamp(Math.round(6+5*Math.sin(this.t*2+i)),0,24):0).padStart(2,'0');g+=(q.gthr>-80&&Math.sin(this.t*1.3+i)<-.3)?'0':'1';}this.emit('r'+a+g);}
+    else if(c==='D'){const o=parseInt(l.slice(1),10),ch=o<4?this.st.ch[o]:this.st.idyn[o-4];this.emit(`d${o}|${DYNK.map(k=>ch[k]).join(',')}`);}
+    else if(c==='R'){this.t+=.15;let a='',g='';for(let i=0;i<4;i++){const q=this.st.ch[i];a+=String(q.cthr<0?clamp(Math.round(6+5*Math.sin(this.t*2+i)),0,24):0).padStart(2,'0');g+=(q.gthr>-80&&Math.sin(this.t*1.3+i)<-.3)?'0':'1';}let ai='',gi='';for(let j=0;j<2;j++){const q=this.st.idyn[j];ai+=String(q.cthr<0?clamp(Math.round(5+4*Math.sin(this.t*2.3+j)),0,24):0).padStart(2,'0');gi+=(q.gthr>-80&&Math.sin(this.t*1.1+j)<-.3)?'0':'1';}this.emit('r'+a+g+ai+gi);}
     else if(c==='E'){const o=parseInt(l.slice(1),10),ch=this.st.ch[o];this.emit(`e${o}|${ch.eqf.join(',')}|${ch.eqq.map(q=>q.toFixed(1)).join(',')}`);}
   },
   stateLine(){const s=this.st;let r=`t${this.ver}|${[s.inL,s.inR,s.chosen,s.specSrc,s.peak,s.tone,s.pink,s.ig[0].toFixed(1),s.ig[1].toFixed(1),s.il[0].toFixed(1),s.il[1].toFixed(1)].join(',')}`;
     s.ch.forEach(c=>{r+=`|${[c.src,c.hpft,c.lpft,c.hpf,c.hps,c.lpf,c.lps,c.gain.toFixed(1),c.dly.toFixed(1),c.lim.toFixed(1),c.phase,c.mute,...c.eq.map(v=>v.toFixed(1))].join(',')}`;});return r;},
-  apply(k,v){const s=this.st,n=parseFloat(v),m=k.match(/^o([1-4])\.(\w+)$/);
+  apply(k,v){const s=this.st,n=parseFloat(v),m=k.match(/^o([1-4])\.(\w+)$/),mi=k.match(/^id([01])\.(\w+)$/);
     if(k==='inL')s.inL=+(v==='1');else if(k==='inR')s.inR=+(v==='1');
     else if(k==='ig0'||k==='ig1')s.ig[+k[2]]=clamp(n,-24,24);
     else if(k==='il0'||k==='il1')s.il[+k[2]]=clamp(n,-24,.5);
     else if(k==='spec.src')s.specSrc=n;else if(k==='spec.peak')s.peak=+(v==='1');
     else if(k==='tone'){s.tone=n;s.pink=0;}else if(k==='pink'){s.pink=n;s.tone=0;}
     else if(k==='preset.load'||k==='preset.save')s.chosen=n;
+    else if(mi){const c=s.idyn[mi[1]],f=mi[2];if(f==='cratio')c.cr=n;else if(f in DYN_DEF)c[f]=n;}
     else if(m){const c=s.ch[m[1]-1],f=m[2],near=(t,d)=>SLOPES[t].reduce((b,x)=>Math.abs(x-d)<Math.abs(b-d)?x:b);
       if(f==='src')c.src=v==='L'?1:v==='R'?2:0;
       else if(f==='hpf')c.hpf=n;else if(f==='lpf')c.lpf=n;
