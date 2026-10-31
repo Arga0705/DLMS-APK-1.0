@@ -18,6 +18,18 @@ window.NativeBle = {
     return BleClient.writeWithoutResponse(id, SVC, RX, new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength));
   },
   disconnect(id) { return BleClient.disconnect(id); },
+
+  // --- Karakteristik lain berdasarkan UUID (dipakai update firmware langsung dari UI, tanpa Chrome) ---
+  // Karakteristik OTA 6e400004 tidak punya write-no-response, jadi pakai write biasa (dengan response).
+  writeChar(id, uuid, bytes) {
+    return BleClient.write(id, SVC, uuid, new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength));
+  },
+  notifyChar(id, uuid, cb) { return BleClient.startNotifications(id, SVC, uuid, cb); },
+  // Dipanggil UI setelah connect: minta koneksi cepat (dan MTU besar bila plugin mendukung). Gagal = diabaikan.
+  async requestMtu(id, mtu) {
+    try { await BleClient.requestConnectionPriority(id, 1); } catch (_) {}   // 1 = HIGH
+    try { if (typeof BleClient.requestMtu === 'function') await BleClient.requestMtu(id, mtu); } catch (_) {}
+  },
 };
 
 // Update firmware (dipakai kartu Update firmware di menu System)
